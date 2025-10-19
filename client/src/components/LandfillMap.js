@@ -7,7 +7,7 @@ function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/landfills')
+    axios.get('http://localhost:5299/api/landfills')
       .then(res => setLandfills(res.data))
       .catch(err => console.error(err));
   }, []);

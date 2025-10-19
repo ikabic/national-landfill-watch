@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using server.data;
 
 namespace server.controllers
 {
@@ -6,14 +8,18 @@ namespace server.controllers
     [Route("api/[controller]")]
     public class LandfillsController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Get()
+        private readonly AppDbContext _context;
+
+        public LandfillsController(AppDbContext context)
         {
-            var mock = new[]{
-                new { Id=1, Name="Divlja deponija A", Category="wild", GeoJson="{}" },
-                new { Id=2, Name="Sanitarna B", Category="sanitary", GeoJson="{}" }
-            };
-            return Ok(mock);
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var landfills = await _context.Landfills.ToListAsync();
+            return Ok(landfills);
         }
     }
 }
