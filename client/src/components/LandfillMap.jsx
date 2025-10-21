@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import MapControls from "./MapControls";
 import { makePinIcon } from "../utils/makePinIcon";
+import UserPin from "./UserPin";
 
 import "../css/LandfillMap.css";
 import "leaflet/dist/leaflet.css";
@@ -40,6 +41,8 @@ function LandfillMap() {
         </Popup>
       </Marker>
     ))}
+
+    <UserPin activeMarkerRef={activeMarkerRef} />
   </MapContainer>
 }
 
