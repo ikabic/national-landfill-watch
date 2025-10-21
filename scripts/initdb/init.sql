@@ -1,5 +1,5 @@
 
-CREATE DATABASE IF NOT EXISTS landfill_db; 
+CREATE DATABASE landfill_db; 
 \c landfill_db
 
 CREATE TABLE IF NOT EXISTS public.landfills (
