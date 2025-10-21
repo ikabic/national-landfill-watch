@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.data;
+using server.dtos; 
 
 namespace server.controllers
 {
@@ -54,5 +55,30 @@ namespace server.controllers
 
             return Ok(new { path });
         }
+
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportLandfills([FromBody] List<LandfillDto> landfills)
+        {
+             foreach (var lf in landfills)
+             {
+                var entity = new Landfill
+                {
+                   Name = lf.Name,
+                   Status = lf.Status,
+                   Lat = lf.Lat,
+                   Lng = lf.Lng,
+                   AreaM2 = lf.AreaM2,
+                   VolumeM3 = lf.VolumeM3,
+                   MethaneTonsPerYear = lf.MethaneTonsPerYear,
+                   CO2eTonsPerYear = lf.CO2eTonsPerYear,
+                   GeoJson = lf.GeoJson ?? "{}",
+                   ReportedAt = DateTime.UtcNow
+                };
+               _context.Landfills.Add(entity);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(new { Message = "Landfills imported successfully" });
+        }
+
     }
 }
