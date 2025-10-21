@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
+import L from "leaflet";
 
 import "../css/LandfillMap.css";
 import "leaflet/dist/leaflet.css";
@@ -8,6 +9,21 @@ import "leaflet/dist/leaflet.css";
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
+
+  const makePinIcon = (color, innerIcon) =>
+    new L.DivIcon({
+      html: `
+      <div class="pin-body" style="--pin-color:${color}">
+        <div class="pin-inner">${innerIcon}</div>
+      </div>
+    `,
+      className: "pin",
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+    });
+
+  const sanitaryIcon = makePinIcon("#2E7D32", "♻️");
+  const unsanitaryIcon = makePinIcon("#d18135ff", "☣️");
 
   useEffect(() => {
     axios.get("/api/landfills")
@@ -25,7 +41,7 @@ function LandfillMap() {
     {border && <GeoJSON data={border} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
 
     {landfills.map((lf) => (
-      <Marker key={lf.id} position={[lf.lat, lf.lng]}>
+      <Marker key={lf.id} position={[lf.lat, lf.lng]} icon={lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon}>
         <Popup>
           {lf.name} ({lf.category})
         </Popup>
