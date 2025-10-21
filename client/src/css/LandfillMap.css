@@ -6,8 +6,8 @@
 
 .pin .pin-body {
     background: var(--pin-color, #2E7D32);
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg);
     position: relative;
@@ -36,4 +36,8 @@
     color: white;
     line-height: 1;
     text-align: center;
+}
+
+.leaflet-control-attribution, .leaflet-control-container .leaflet-control {
+  display: none !important;
 }
