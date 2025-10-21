@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.data;
+using server.dtos; 
 
 namespace server.controllers
 {
@@ -21,5 +22,63 @@ namespace server.controllers
             var landfills = await _context.Landfills.ToListAsync();
             return Ok(landfills);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var landfill = await _context.Landfills.FindAsync(id);
+            if (landfill == null)
+                return NotFound();
+            return Ok(landfill);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] Landfill newLandfill)
+        {
+            _context.Landfills.Add(newLandfill);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetById), new { id = newLandfill.Id }, newLandfill);
+        }
+
+        [HttpPost("{id}/image")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile file)
+        {
+            var landfill = await _context.Landfills.FindAsync(id);
+            if (landfill == null)
+                return NotFound();
+
+            var path = Path.Combine("wwwroot/images/landfills", $"{id}_{file.FileName}");
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok(new { path });
+        }
+
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportLandfills([FromBody] List<LandfillDto> landfills)
+        {
+             foreach (var lf in landfills)
+             {
+                var entity = new Landfill
+                {
+                   Name = lf.Name,
+                   Status = lf.Status,
+                   Lat = lf.Lat,
+                   Lng = lf.Lng,
+                   AreaM2 = lf.AreaM2,
+                   VolumeM3 = lf.VolumeM3,
+                   MethaneTonsPerYear = lf.MethaneTonsPerYear,
+                   CO2eTonsPerYear = lf.CO2eTonsPerYear,
+                   GeoJson = lf.GeoJson ?? "{}",
+                   ReportedAt = DateTime.UtcNow
+                };
+               _context.Landfills.Add(entity);
+            }
+            await _context.SaveChangesAsync();
+            return Ok(new { Message = "Landfills imported successfully" });
+        }
+
     }
 }
