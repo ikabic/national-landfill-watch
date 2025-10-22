@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.data;
-using server.dtos; 
+using server.dtos;
+using server.models;
 
 namespace server.controllers
 {
@@ -59,8 +60,8 @@ namespace server.controllers
         [HttpPost("import")]
         public async Task<IActionResult> ImportLandfills([FromBody] List<LandfillDto> landfills)
         {
-             foreach (var lf in landfills)
-             {
+            foreach (var lf in landfills)
+            {
                 var entity = new Landfill
                 {
                     ImageName = lf.ImageName,
@@ -81,7 +82,7 @@ namespace server.controllers
                     Width = lf.Width,
                     Height = lf.Height
                 };
-               _context.Landfills.Add(entity);
+                _context.Landfills.Add(entity);
             }
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Landfills imported successfully" });
