@@ -10,6 +10,7 @@ import MarkerCluster from "./MarkerCluster";
 import MapControls from "./MapControls";
 import UserPin from "./UserPin";
 import LandfillDetailsPanel from "./LandfillDetailsPanel";
+import MapLegend from "./MapLegend";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
@@ -68,8 +69,12 @@ function LandfillMap() {
       <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
 
       {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
+
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+
       <button className="panel-btn"><FaBars /></button>
+
+      <MapLegend />
     </MapContainer>
   );
 }
