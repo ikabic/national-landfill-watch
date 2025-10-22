@@ -9,6 +9,11 @@ export default defineConfig({
         target: 'http://localhost:5299',
         changeOrigin: true,
         secure: false,
+      },
+      '/static': {
+        target: 'http://localhost:5299',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }
