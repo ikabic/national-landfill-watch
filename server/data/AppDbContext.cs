@@ -1,13 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using server.models;
 using NetTopologySuite.Geometries;
 using server.models;
 using server.dtos;
+
 
 namespace server.data
 {
     public class AppDbContext : DbContext
     {
         public DbSet<Landfill> Landfills { get; set; }
+        public DbSet<RegisterLandfill> RegisterLandfills { get; set; }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -19,6 +23,9 @@ namespace server.data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Landfill>().ToTable("landfills");
+            modelBuilder.Entity<RegisterLandfill>().ToTable("register_landfills"); // poveži model s tabelom
 
             modelBuilder.Entity<Landfill>(entity =>
             {

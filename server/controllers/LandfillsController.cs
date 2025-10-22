@@ -23,30 +23,30 @@ namespace server.controllers
         public async Task<IActionResult> Get()
         {
             var landfills = await _context.Landfills
-            .Select(l => new LandfillDto
-            {
-                Id = l.Id,
-                ImageName = l.ImageName,
-                Status = l.Status,
-                StartYear = l.StartYear,
-                LifeYears = l.LifeYears,
-                AreaM2 = l.AreaM2,
-                VolumeM3 = l.VolumeM3,
-                TotalMassTon = l.TotalMassTon,
-                AnnualMswM3 = l.AnnualMswM3,
-                AnnualCH4Tonnes = l.AnnualCH4Tonnes,
-                AnnualCO2eTonnes = l.AnnualCO2eTonnes,
-                GeoJson = l.GeoJson,
-                CenterLat = l.CenterLat,
-                CenterLon = l.CenterLon,
-                CenterX = l.CenterX,
-                CenterY = l.CenterY,
-                Width = l.Width,
-                Height = l.Height
-            })
-            .ToListAsync();
+                .Select(l => new LandfillDto
+                {
+                    Id = l.Id,
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    StartYear = l.StartYear,
+                    LifeYears = l.LifeYears,
+                    AreaM2 = l.AreaM2,
+                    VolumeM3 = l.VolumeM3,
+                    TotalMassTon = l.TotalMassTon,
+                    AnnualMswM3 = l.AnnualMswM3,
+                    AnnualCH4Tonnes = l.AnnualCH4Tonnes,
+                    AnnualCO2eTonnes = l.AnnualCO2eTonnes,
+                    GeoJson = l.GeoJson,
+                    CenterLat = l.CenterLat,
+                    CenterLon = l.CenterLon,
+                    CenterX = l.CenterX,
+                    CenterY = l.CenterY,
+                    Width = l.Width,
+                    Height = l.Height
+                })
+                .ToListAsync();
 
-        return Ok(landfills);
+            return Ok(landfills);
         }
 
         [HttpGet("{id}")]
@@ -131,8 +131,10 @@ namespace server.controllers
                     Width = lf.Width,
                     Height = lf.Height
                 };
+
                 _context.Landfills.Add(entity);
             }
+
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Landfills imported successfully" });
         }
@@ -142,25 +144,24 @@ namespace server.controllers
         {
             var landfills = await _context.LandfillCheckPointDto
                 .FromSqlInterpolated($@"
-            SELECT 
-                l.id AS ""Id"",
-                l.image_name AS ""ImageName"",
-                l.status AS ""Status"",
-                l.start_year AS ""StartYear"",
-                (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision AS ""InfluenceRadius"",
-                l.center_lat AS ""CenterLat"",
-                l.center_lon AS ""CenterLon""
-            FROM ""landfills"" AS l
-            WHERE ST_DWithin(
-                geom,
-                ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography,
-                (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision
-            )
-        ")
+                    SELECT 
+                        l.id AS ""Id"",
+                        l.image_name AS ""ImageName"",
+                        l.status AS ""Status"",
+                        l.start_year AS ""StartYear"",
+                        (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision AS ""InfluenceRadius"",
+                        l.center_lat AS ""CenterLat"",
+                        l.center_lon AS ""CenterLon""
+                    FROM ""landfills"" AS l
+                    WHERE ST_DWithin(
+                        geom,
+                        ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography,
+                        (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision
+                    )
+                ")
                 .ToListAsync();
 
             return Ok(landfills);
         }
-
     }
 }
