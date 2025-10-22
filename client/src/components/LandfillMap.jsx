@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Circle } from "react-leaflet";
 
 import "../css/LandfillMap.css";
 import "leaflet/dist/leaflet.css";
@@ -35,6 +35,7 @@ function LandfillMap() {
     {border && <GeoJSON data={border} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
 
     {landfills.map(lf => (
+          <>
           <Marker
             key={lf.id}
             position={[lf.lat, lf.lng]}
@@ -42,6 +43,15 @@ function LandfillMap() {
           >
             <Popup>{lf.name}</Popup>
           </Marker>
+           {selectedLandfill?.id === lf.id && (
+             <Circle
+                  key={`circle-${lf.id}`}
+                  center={[lf.lat, lf.lng]}
+                  radius={1000}
+                  pathOptions={{ color: "red", fillColor: "red", fillOpacity: 0.15 }}
+             />
+           )}
+        </>
         ))}
     {selectedLandfill && (
         <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />
