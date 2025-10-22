@@ -5,8 +5,6 @@ using NetTopologySuite.Geometries;
 
 namespace server.models
 {
-    namespace server.models
-{
     [Table("landfills")]
         public class Landfill
         {
@@ -70,6 +68,5 @@ namespace server.models
 
         [Column("geom")]
         public Point? Geom { get; set; }
-    }
     }
 }
