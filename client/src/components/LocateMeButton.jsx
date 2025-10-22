@@ -32,6 +32,10 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef }) {
 
                 const areas = await LandfillProximity(map, latitude, longitude);
                 if(areas) areas.forEach(area => landfillProximityRef.current.push(area));
+
+                areas && areas.length > 0 
+                ? toast.warn("Your location is within the influence area of one or more unsanitary landfills.")
+                : toast.info("Your location is not in the immediate vicinity of any mapped landfills.");
             },
             (err) => { toast.error("Unable to retrieve your location: " + err.message); }
         );
