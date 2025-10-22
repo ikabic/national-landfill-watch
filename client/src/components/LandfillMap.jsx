@@ -1,50 +1,24 @@
-import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet.markercluster/dist/MarkerCluster.css";
-import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import "leaflet.markercluster";
-
-import MapControls from "./MapControls";
-import { makePinIcon } from "../utils/makePinIcon";
-import UserPin from "./UserPin";
-import { FaBars } from "react-icons/fa";
-import LandfillDetailsPanel from "./LandfillDetailsPanel";
 import * as turf from "@turf/turf";
 
+import { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { FaBars } from "react-icons/fa";
+
+import MarkerCluster from "./MarkerCluster";
+import MapControls from "./MapControls";
+import UserPin from "./UserPin";
+import LandfillDetailsPanel from "./LandfillDetailsPanel";
+
+import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
-
-function MarkerClusterGroupWrapper({ landfills, handleMarkerClick, sanitaryIcon, unsanitaryIcon }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const markers = L.markerClusterGroup();
-
-    landfills.forEach((lf) => {
-      const marker = L.marker([lf.centerLat, lf.centerLon], {
-        icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon
-      }).on("click", () => handleMarkerClick(lf.id));
-
-      markers.addLayer(marker);
-    });
-
-    map.addLayer(markers);
-    return () => map.removeLayer(markers);
-  }, [landfills, map]);
-
-  return null;
-}
 
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
   const activeMarkerRef = useRef(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
-
-  const sanitaryIcon = makePinIcon("#2E7D32", "♻️");
-  const unsanitaryIcon = makePinIcon("#d18135ff", "☣️");
 
   useEffect(() => {
     axios.get("/api/landfills")
@@ -94,12 +68,7 @@ function LandfillMap() {
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
 
-      <MarkerClusterGroupWrapper
-        landfills={landfills}
-        handleMarkerClick={handleMarkerClick}
-        sanitaryIcon={sanitaryIcon}
-        unsanitaryIcon={unsanitaryIcon}
-      />
+      <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
 
       {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
       <UserPin activeMarkerRef={activeMarkerRef} />
