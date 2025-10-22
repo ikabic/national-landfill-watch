@@ -41,3 +41,11 @@
 .leaflet-control-attribution, .leaflet-control-container .leaflet-control {
   display: none !important;
 }
+
+.panel-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  z-index: 1000;
+}

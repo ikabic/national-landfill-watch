@@ -5,6 +5,7 @@ import L from "leaflet";
 import MapControls from "./MapControls";
 import { makePinIcon } from "../utils/makePinIcon";
 import UserPin from "./UserPin";
+import { FaBars } from "react-icons/fa"
 
 import "../css/LandfillMap.css";
 import "leaflet/dist/leaflet.css";
@@ -43,6 +44,8 @@ function LandfillMap() {
     ))}
 
     <UserPin activeMarkerRef={activeMarkerRef} />
+
+    <button className="panel-btn"><FaBars /></button>
   </MapContainer>
 }
 

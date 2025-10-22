@@ -8,7 +8,7 @@
   z-index: 1000;
 }
 
-.map-controls button {
+.map-controls button, .panel-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,12 +23,12 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.map-controls button:hover {
+.map-controls button:hover, .panel-btn:hover {
   background-color: var(--brand-secondary);
   transform: scale(1.05);
 }
 
-.map-controls button:active {
+.map-controls button:active, .panel-btn:active {
   background-color: var(--brand-secondary);
   transform: scale(0.95);
 }

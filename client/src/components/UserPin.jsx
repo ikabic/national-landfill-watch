@@ -7,7 +7,7 @@ function UserPin({ activeMarkerRef }) {
 
   const map = useMapEvents({
     click(e) {
-      if (e.originalEvent.target.closest(".map-controls")) return;
+      if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn")) return;
       if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
 
       const newMarker = L.marker(e.latlng, { icon: userIcon }).addTo(map);
