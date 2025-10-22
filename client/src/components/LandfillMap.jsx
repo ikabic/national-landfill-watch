@@ -17,8 +17,10 @@ import "../css/LandfillMap.css";
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
-  const activeMarkerRef = useRef(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
+
+  const activeMarkerRef = useRef(null);
+  const landfillProximityRef = useRef([]);
 
   useEffect(() => {
     axios.get("/api/landfills")
@@ -38,16 +40,11 @@ function LandfillMap() {
               const unionInput = turf.featureCollection([...a.features, ...b.features]);
               merged = turf.combine(unionInput);
               merged = turf.buffer(merged, 0);
-            } catch (err) {
-              console.warn("Union failed for feature", i, err);
-            }
+            } catch (err) { console.warn("Union failed for feature", i, err); }
           }
           setBorder(merged);
-        } else if (data.type === "Feature") {
-          setBorder(data);
-        } else {
-          console.error("Unexpected GeoJSON structure:", data);
-        }
+        } else if (data.type === "Feature") { setBorder(data);
+        } else { console.error("Unexpected GeoJSON structure:", data); }
       })
       .catch((err) => console.error("Failed to load border:", err));
   }, []);
@@ -64,14 +61,14 @@ function LandfillMap() {
     <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}>
       <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
-      <MapControls activeMarkerRef={activeMarkerRef} />
+      <MapControls activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
 
       <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
 
       {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
-      <UserPin activeMarkerRef={activeMarkerRef} />
+      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
       <button className="panel-btn"><FaBars /></button>
     </MapContainer>
   );
