@@ -2,6 +2,7 @@ namespace server.dtos
 {
     public class LandfillDto
     {
+        public int Id { get; set; }
         public string ImageName { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public int StartYear { get; set; }
