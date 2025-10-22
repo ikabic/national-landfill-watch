@@ -63,16 +63,23 @@ namespace server.controllers
              {
                 var entity = new Landfill
                 {
-                   Name = lf.Name,
-                   Status = lf.Status,
-                   Lat = lf.Lat,
-                   Lng = lf.Lng,
-                   AreaM2 = lf.AreaM2,
-                   VolumeM3 = lf.VolumeM3,
-                   MethaneTonsPerYear = lf.MethaneTonsPerYear,
-                   CO2eTonsPerYear = lf.CO2eTonsPerYear,
-                   GeoJson = lf.GeoJson ?? "{}",
-                   ReportedAt = DateTime.UtcNow
+                    ImageName = lf.ImageName,
+                    Status = lf.Status,
+                    StartYear = lf.StartYear,
+                    LifeYears = lf.LifeYears,
+                    AreaM2 = lf.AreaM2,
+                    VolumeM3 = lf.VolumeM3,
+                    TotalMassTon = lf.TotalMassTon,
+                    AnnualMswM3 = lf.AnnualMswM3,
+                    AnnualCH4Tonnes = lf.AnnualCH4Tonnes,
+                    AnnualCO2eTonnes = lf.AnnualCO2eTonnes,
+                    GeoJson = lf.GeoJson,
+                    CenterLat = lf.CenterLat,
+                    CenterLon = lf.CenterLon,
+                    CenterX = lf.CenterX,
+                    CenterY = lf.CenterY,
+                    Width = lf.Width,
+                    Height = lf.Height
                 };
                _context.Landfills.Add(entity);
             }
