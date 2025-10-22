@@ -1,0 +1,10 @@
+NEMA POTREBE ZA POKRETANJEM SKRIPTI TRENUTNO, SVA TRI FAJLA SU KOMBINOVANA U final.csv. Stoje i odvojeni fajlovi, imaju final na kraju.
+
+
+Skripte imenovane TipDeponijeUCSV obradjuju podatke u .xlsx fajlovima i konvertuju relevantne podatke u csv fjal spreman za dalje koriscenje
+
+Samo treba da se pokrenu iz ovog foldera i na osnovu .xlsx fajlova, koji su javni registri sa data.gov.rs, i same ce kreirati .csv fajl 
+
+PRE pokretanja RacunanjeZaSanitarneNesanitarne uci u kod i namestiti file name od one za koje treba da se racuna finalni csv.
+
+Finalni csv su csvovi izracunati sa svime potrebnim, dok oni bez final imaju samo osnovne informacije.
