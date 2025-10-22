@@ -4,9 +4,9 @@
   "description": "<h1 align=\"center\">\r     <br>\r     <a href=\"/\">\r     <img width=\"1800\" src=\"https://github.com/user-attachments/assets/cc3519e0-4688-46a9-8dba-8f5e82b0fb5c\" />\r     </a>\r     <br>\r </h1>",
   "main": "index.jsx",
   "scripts": {
-    "setup": "cd client && npm install && cd ../server && dotnet restore",
+    "setup": "npm install && cd client && npm install && cd ../server && dotnet restore",
     "dev": "concurrently \"cd server && dotnet run\" \"cd client && npm run dev\"",
-    "build": "cd client && npm run build && cd ../server && dotnet publish -c Release -o publish",
+    "build": "cd client && npm run build",
     "start": "npm run build && npm run dev"
   },
   "repository": {
@@ -23,5 +23,12 @@
   "homepage": "https://github.com/ikabic/national-landfill-watch#readme",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "@turf/turf": "^7.2.0",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-cluster": "^3.1.1"
   }
 }
