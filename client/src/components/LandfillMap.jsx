@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
+import * as turf from "@turf/turf";
 
 import "../css/LandfillMap.css";
 import "leaflet/dist/leaflet.css";
@@ -17,8 +18,40 @@ function LandfillMap() {
       .catch((err) => console.error(err));
 
     axios.get("/serbia-border.geojson")
-      .then((res) => setBorder(res.data))
-      .catch((err) => console.error("Failed to load border:", err));
+    .then((res) => {
+      const data = res.data;
+
+      if (data.type === "FeatureCollection" && data.features?.length > 0) {
+        let merged = data.features[0];
+
+        for (let i = 1; i < data.features.length; i++) {
+          try {
+            // Normalizuj obe geometrije da budu MultiPolygon
+            const a = turf.flatten(merged);
+            const b = turf.flatten(data.features[i]);
+
+            // Ako flatten da više delova, spoji ih u kolekciju
+            const unionInput = turf.featureCollection([
+              ...a.features,
+              ...b.features
+            ]);
+
+            // Napravi jedan MultiPolygon iz svih
+            merged = turf.combine(unionInput);
+            merged = turf.buffer(merged, 0); // da spoji i ako su male rupe
+          } catch (err) {
+            console.warn("Union failed for feature", i, err);
+          }
+        }
+
+        setBorder(merged);
+      } else if (data.type === "Feature") {
+        setBorder(data);
+      } else {
+        console.error("Unexpected GeoJSON structure:", data);
+      }
+    })
+    .catch((err) => console.error("Failed to load border:", err));
   }, []);
 
   const handleMarkerClick = (id) => {
@@ -37,10 +70,10 @@ function LandfillMap() {
     {landfills.map(lf => (
           <Marker
             key={lf.id}
-            position={[lf.lat, lf.lng]}
+            position={[lf.centerLat, lf.centerLon]}
             eventHandlers={{ click: () => handleMarkerClick(lf.id) }}
           >
-            <Popup>{lf.name}</Popup>
+            <Popup>{lf.id}</Popup>
           </Marker>
         ))}
     {selectedLandfill && (
