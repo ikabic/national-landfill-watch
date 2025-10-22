@@ -45,6 +45,7 @@ public class Landfill
     [Column("center_lat")]
     public double? CenterLat { get; set; }
 
+
     [Column("center_lon")]
     public double? CenterLon { get; set; }
 
