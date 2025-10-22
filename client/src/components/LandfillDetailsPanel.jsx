@@ -36,6 +36,10 @@ function LandfillDetailsPanel({ landfill, onClose }) {
           ctx.stroke();
         }
 
+        console.log(
+          geo.features.find(f => f.properties.type === "influence")
+        );
+
       } catch (err) {
         console.error("Failed to parse GeoJSON", err);
       }
