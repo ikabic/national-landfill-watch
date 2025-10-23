@@ -8,40 +8,60 @@ function LandfillDetailsPanel({ landfill, onClose }) {
 
   const imageUrl = `/static/images/landfills/${landfill.imageName}.jpg`;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) return;
+  //   const ctx = canvas.getContext("2d");
 
-    const img = new Image();
-    img.src = imageUrl;
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
+  //   const img = new Image();
+  //   img.src = imageUrl;
+  //   img.onload = () => {
+  //     canvas.width = img.width;
+  //     canvas.height = img.height;
 
-      // nacrtaj osnovnu sliku
-      ctx.drawImage(img, 0, 0);
+  //     // nacrtaj osnovnu sliku
+  //     ctx.drawImage(img, 0, 0);
 
-      // nacrtaj bbox direktno na slici
-      try {
-        const geo = JSON.parse(landfill.geoJson);
-        const bbox = geo.features.find(f => f.properties.type === "bbox");
-        if (bbox) {
-          ctx.beginPath();
-          bbox.geometry.coordinates[0].forEach(([x, y], i) => {
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          });
-          ctx.closePath();
-          ctx.strokeStyle = "white";  // ili crveno, ili šta želiš
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      } catch (err) {
-        console.error("Failed to parse GeoJSON", err);
-      }
-    };
-  }, [imageUrl, landfill]);
+  //     // nacrtaj bbox direktno na slici
+  //     try {
+  //       const geo = JSON.parse(landfill.geoJson);
+  //       const bbox = geo.features.find(f => f.properties.type === "bbox");
+  //       if (bbox) {
+  //         ctx.beginPath();
+  //         bbox.geometry.coordinates[0].forEach(([x, y], i) => {
+  //           if (i === 0) ctx.moveTo(x, y);
+  //           else ctx.lineTo(x, y);
+  //         });
+  //         ctx.closePath();
+  //         ctx.strokeStyle = "white";  // ili crveno, ili šta želiš
+  //         ctx.lineWidth = 2;
+  //         ctx.stroke();
+  //       }
+
+  //       console.log(landfill.segmentation)
+  //       if (landfill.segmentation != 'null') {
+  //         const seg = JSON.parse(landfill.segmentation);
+  //         seg.features.forEach((feature) => {
+  //           if (feature.geometry.type === "Polygon") {
+  //             ctx.beginPath();
+  //             feature.geometry.coordinates[0].forEach(([x, y], i) => {
+  //               if (i === 0) ctx.moveTo(x, y);
+  //               else ctx.lineTo(x, y);
+  //             });
+  //             ctx.closePath();
+  //             ctx.strokeStyle = "lime"; 
+  //             ctx.lineWidth = 2;
+  //             ctx.stroke();
+  //             ctx.fillStyle = "rgba(0,255,0,0.2)";
+  //             ctx.fill();
+  //           }
+  //         });
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to parse GeoJSON", err);
+  //     }
+  //   };
+  // }, [imageUrl, landfill]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -79,6 +99,29 @@ function LandfillDetailsPanel({ landfill, onClose }) {
           }
         } catch (err) {
           console.error("Failed to parse GeoJSON", err);
+        }
+
+        try {
+          if (landfill.segmentation && landfill.segmentation !== "null") {
+            const seg = JSON.parse(landfill.segmentation);
+            seg.features.forEach((feature) => {
+              if (feature.geometry.type === "Polygon") {
+                ctx.beginPath();
+                feature.geometry.coordinates[0].forEach(([x, y], i) => {
+                  if (i === 0) ctx.moveTo(x, y);
+                  else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.strokeStyle = "lime";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = "rgba(0,255,0,0.2)";
+                ctx.fill();
+              }
+            });
+          }
+        } catch (err) {
+          console.error("Failed to parse segmentation JSON", err);
         }
       };
 
