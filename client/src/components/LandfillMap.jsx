@@ -53,24 +53,12 @@ function LandfillMap() {
       .then((res) => setLandfills(res.data))
       .catch((err) => console.error(err));
 
-    axios.get("/serbia-border.geojson")
+    axios.get("/serbia.geojson")
       .then((res) => {
         const data = res.data;
 
         if (data.type === "FeatureCollection" && data.features?.length > 0) {
-          let merged = data.features[0];
-          for (let i = 1; i < data.features.length; i++) {
-            try {
-              const a = turf.flatten(merged);
-              const b = turf.flatten(data.features[i]);
-              const unionInput = turf.featureCollection([...a.features, ...b.features]);
-              merged = turf.combine(unionInput);
-              merged = turf.buffer(merged, 0);
-            } catch (err) {
-              console.warn("Union failed for feature", i, err);
-            }
-          }
-          setBorder(merged);
+          setBorder(data.features[0]);
         } else if (data.type === "Feature") {
           setBorder(data);
         } else {
