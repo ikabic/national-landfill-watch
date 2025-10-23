@@ -14,6 +14,7 @@ namespace server.dtos
         public double? AnnualCH4Tonnes { get; set; }
         public double? AnnualCO2eTonnes { get; set; }
         public string GeoJson { get; set; } = "{}";
+        public string Segmentation { get; set; } = "{}";
         public double? CenterLat { get; set; }
         public double? CenterLon { get; set; }
         public double? CenterX { get; set; }

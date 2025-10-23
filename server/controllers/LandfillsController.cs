@@ -84,6 +84,7 @@ namespace server.controllers
                     AnnualCH4Tonnes = l.AnnualCH4Tonnes,
                     AnnualCO2eTonnes = l.AnnualCO2eTonnes,
                     GeoJson = l.GeoJson,
+                    Segmentation = l.Segmentation,
                     CenterLat = l.CenterLat,
                     CenterLon = l.CenterLon,
                     CenterX = l.CenterX,
