@@ -25,7 +25,7 @@ function MarkerClusterGroupWrapper({ landfills, handleMarkerClick, sanitaryIcon,
     landfills.forEach((lf) => {
       const marker = L.marker([lf.centerLat, lf.centerLon], {
         icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon
-      }).on("click", () => handleMarkerClick(lf.id));
+      }).on("click", () => handleMarkerClick(lf.id, map));
 
       markers.addLayer(marker);
     });
@@ -45,6 +45,8 @@ function LandfillMap() {
 
   const sanitaryIcon = makePinIcon("#2E7D32", "♻️");
   const unsanitaryIcon = makePinIcon("#d18135ff", "☣️");
+
+  const circlesRef = useRef([]);
 
   useEffect(() => {
     axios.get("/api/landfills")
@@ -78,9 +80,28 @@ function LandfillMap() {
       .catch((err) => console.error("Failed to load border:", err));
   }, []);
 
-  const handleMarkerClick = (id) => {
+  const handleMarkerClick = (id, map) => {
     axios.get(`/api/landfills/${id}`)
-      .then(res => setSelectedLandfill(res.data))
+      .then(res => {
+        const landfill = res.data;
+        setSelectedLandfill(landfill);
+
+        circlesRef.current.forEach(c => map.removeLayer(c));
+        circlesRef.current = [];
+
+        const geo = JSON.parse(landfill.geoJson);
+        const influenceRadius = geo.features.find(f => f.properties.type === "influence").properties['influence_radius'];
+
+        const circle = L.circle([landfill.centerLat, landfill.centerLon], {
+          radius: influenceRadius,
+          color: "#d9534f",
+          weight: 2,
+          fillOpacity: 0.2,
+          interactive: false 
+        }).addTo(map);
+
+        circlesRef.current.push(circle);
+      })
       .catch(err => console.error(err));
   };
 
@@ -102,7 +123,7 @@ function LandfillMap() {
       />
 
       {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
-      <UserPin activeMarkerRef={activeMarkerRef} />
+      <UserPin activeMarkerRef={activeMarkerRef} circlesRef={circlesRef}/>
       <button className="panel-btn"><FaBars /></button>
     </MapContainer>
   );

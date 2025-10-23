@@ -4,9 +4,8 @@ import { makePinIcon } from "../utils/makePinIcon";
 import axios from "axios";
 import { useRef } from "react";
 
-function UserPin({ activeMarkerRef }) {
+function UserPin({ activeMarkerRef, circlesRef }) {
   const userIcon = makePinIcon("#b52727ff", "⬤");
-  const circlesRef = useRef([])
 
   const map = useMapEvents({
     click: async (e) => {
@@ -39,13 +38,13 @@ function UserPin({ activeMarkerRef }) {
         }
 
         landfills.forEach(lf => {
-        const circle = L.circle([lf.centerLat, lf.centerLon], {
-          radius: lf.influenceRadius,
-          color: "#d9534f",
-          weight: 2,
-          fillOpacity: 0.2,
-          interactive: false 
-        }).addTo(map);
+          const circle = L.circle([lf.centerLat, lf.centerLon], {
+            radius: lf.influenceRadius,
+            color: "#d9534f",
+            weight: 2,
+            fillOpacity: 0.2,
+            interactive: false 
+          }).addTo(map);
 
           circlesRef.current.push(circle);
         });
