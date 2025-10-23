@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { getCropRegion } from "../utils/getCropRegion";
 import { setupCanvasZoom } from "../utils/setupCanvasZoom";
 
-function LandfillImageCanvas({ imageName, geoJson, showBoundingBox = true, enableZoom = true }) {
+function LandfillImageCanvas({ imageName, geoJson, segmentation, showBoundingBox = true, showBoundingPolygon = true, enableZoom = true }) {
   const canvasRef = useRef(null);
   const imageUrl = `/static/images/landfills/${imageName}.jpg`;
 
@@ -48,13 +48,37 @@ function LandfillImageCanvas({ imageName, geoJson, showBoundingBox = true, enabl
           ctx.lineWidth = 2;
           ctx.stroke();
         }
+
+        try {
+          if (showBoundingPolygon && segmentation) {
+            const seg = JSON.parse(segmentation);
+            seg.features.forEach((feature) => {
+              if (feature.geometry.type === "Polygon") {
+                ctx.beginPath();
+                feature.geometry.coordinates[0].forEach(([x, y], i) => {
+                  const sx = x * scale;
+                  const sy = (y - cropY) * scale;
+                  i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+                });
+                ctx.closePath();
+                ctx.strokeStyle = "lime";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = "rgba(0,255,0,0.2)";
+                ctx.fill();
+              }
+            });
+          }
+        } catch (err) {
+          console.error("Failed to parse segmentation JSON", err);
+        }
       }
 
       drawBaseImage();
       if (enableZoom) cleanup = setupCanvasZoom(canvas, ctx, drawBaseImage);
     };
     return () => { if (cleanup) cleanup(); };
-  }, [imageUrl, geoJson, showBoundingBox, enableZoom]);
+  }, [imageUrl, geoJson, segmentation, showBoundingBox, showBoundingPolygon, enableZoom]);
 
   return <canvas className="info-panel-image" ref={canvasRef} />;
 }

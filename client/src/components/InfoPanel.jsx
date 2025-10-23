@@ -9,7 +9,7 @@ import LandfillImageCanvas from "./LandfillImageCanvas";
 import "../css/InfoPanel.css";
 
 function InfoPanel({ open, onClose, landfill }) {
-  const [showBoundingBox, setShowBoundingBox] = useState(true);
+  const [showBoundingBox, setShowBoundingBox] = useState(false);
   const [showBoundingPolygon, setShowBoundingPolygon] = useState(true);
   const [enableZoom, setEnableZoom] = useState(false);
 
@@ -20,7 +20,7 @@ function InfoPanel({ open, onClose, landfill }) {
       <div className="info-panel-sidebar">
         <button className="panel-btn close" onClick={onClose}><FaArrowRight /></button>
 
-        <button className={`panel-btn bbox ${showBoundingBox ? "" : "off"}`}
+        <button className={`panel-btn bbox ${showBoundingBox ? "on" : ""}`}
           title="Show bounding box" onClick={() => setShowBoundingBox(!showBoundingBox)}>
           <LuSquareDashed />
         </button>
@@ -42,7 +42,7 @@ function InfoPanel({ open, onClose, landfill }) {
           Serbia Landfill Overview
         </h2>
 
-        {landfill && <LandfillImageCanvas imageName={landfill.imageName} geoJson={landfill.geoJson} showBoundingBox={showBoundingBox} enableZoom={enableZoom} />}
+        {landfill && <LandfillImageCanvas imageName={landfill.imageName} geoJson={landfill.geoJson} segmentation={landfill.segmentation} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
 
         <div className="info-panel-details">
           <div className="info-panel-details-section">

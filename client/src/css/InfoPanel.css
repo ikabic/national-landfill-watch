@@ -66,11 +66,11 @@
     top: 218px;
 }
 
-.panel-btn.bbox.off, .panel-btn.seg.off, .panel-btn.zoom.on {
+.panel-btn.bbox.on, .panel-btn.seg.off, .panel-btn.zoom.on {
     background-color: var(--brand-secondary);
 }
 
-.panel-btn.bbox.off:hover, .panel-btn.seg.off:hover, .panel-btn.zoom.on:hover {
+.panel-btn.bbox.on:hover, .panel-btn.seg.off:hover, .panel-btn.zoom.on:hover {
     background-color: var(--brand-primary);
 }
 
