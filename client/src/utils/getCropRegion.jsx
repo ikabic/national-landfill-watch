@@ -12,9 +12,13 @@ export function getCropRegion(img, coords, aspectRatio = 1 / 4) {
   const ys = coords.map(([, y]) => y);
   const minY = Math.min(...ys);
   const maxY = Math.max(...ys);
-  const bboxCenterY = (minY + maxY) / 2;
+  const bboxHeight = maxY - minY;
 
-  let cropY = bboxCenterY - cropH / 2;
+  let cropY = minY - (cropH - bboxHeight) / 2;
+
+  if (minY < cropH / 2) cropY = 0;
+  if (maxY > imgHeight - cropH / 2) cropY = imgHeight - cropH;
+
   cropY = Math.max(0, Math.min(cropY, imgHeight - cropH));
 
   return { cropY, cropH };

@@ -38,7 +38,7 @@ function LandfillImageCanvas({ imageName, geoJson, showBoundingBox = true, enabl
         if (showBoundingBox && coords.length > 0) {
           ctx.beginPath();
           coords.forEach(([x, y], i) => {
-            if (y < cropY || y > cropY + cropH) return;
+            //if (y < cropY || y > cropY + cropH) return;
             const sx = x * scale;
             const sy = (y - cropY) * scale;
             i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
