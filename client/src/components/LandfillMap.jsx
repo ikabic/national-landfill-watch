@@ -56,19 +56,15 @@ function LandfillMap() {
       .catch(err => console.error(err));
   };
 
-  const closePanel = () => setSelectedLandfill(null);
-
-  return (
+  return <>
     <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}>
-      <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+      <TileLayer className="map-tiles" url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
       <MapControls activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
 
-      {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
+      {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 
       <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
-
-      {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
 
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
 
@@ -76,7 +72,7 @@ function LandfillMap() {
 
       <MapLegend />
     </MapContainer>
-  );
+  </>
 }
 
 export default LandfillMap;
