@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { getCropRegion } from "../utils/getCropRegion";
 
 function LandfillImageCanvas({ imageName, geoJson, showBoundingBox = true }) {
   const canvasRef = useRef(null);
@@ -13,30 +14,44 @@ function LandfillImageCanvas({ imageName, geoJson, showBoundingBox = true }) {
     img.src = imageUrl;
 
     img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
+      let coords = [];
       try {
         const geo = JSON.parse(geoJson);
+        coords = geo.features.find(f => f.properties.type === "bbox")?.geometry ?.coordinates?.[0] || [];
+      } catch { console.warn("Invalid GeoJSON"); }
 
-        const bbox = geo.features.find(f => f.properties.type === "bbox");
-        if (showBoundingBox && bbox) {
-          ctx.beginPath();
-          bbox.geometry.coordinates[0].forEach(([x, y], i) => {
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          });
-          ctx.closePath();
-          ctx.strokeStyle = "white";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      } catch (err) { console.error(err); }
+      const { cropY, cropH } = getCropRegion(img, coords, 1 / 2);
+
+      const containerWidth = canvas.parentElement.clientWidth;
+      const scale = containerWidth / img.width;
+      const scaledHeight = cropH * scale;
+
+      canvas.width = containerWidth;
+      canvas.height = scaledHeight;
+
+      ctx.drawImage(
+        img,
+        0, cropY, img.width, cropH,
+        0, 0, canvas.width, scaledHeight
+      );
+
+      if (showBoundingBox && coords.length > 0) {
+        ctx.beginPath();
+        coords.forEach(([x, y], i) => {
+          if (y < cropY || y > cropY + cropH) return;
+          const sx = x * scale;
+          const sy = (y - cropY) * scale;
+          i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+        });
+        ctx.closePath();
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
     };
   }, [imageUrl, geoJson, showBoundingBox]);
 
-  return <canvas ref={canvasRef} />;
+  return <canvas className="info-panel-image" ref={canvasRef} />;
 }
 
 export default LandfillImageCanvas;
