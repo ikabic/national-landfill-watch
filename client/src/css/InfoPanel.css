@@ -1,0 +1,119 @@
+.info-panel {
+    position: fixed;
+    background: #e4e3df;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1100;
+    color: #222;
+    display: flex;
+}
+
+.info-panel-sidebar {
+    width: 73px;
+    border-right: 1px solid var(--brand-secondary);
+}
+
+.info-panel-main {
+    flex: 1;
+}
+
+@media (min-width: 640px) {
+    .info-panel {
+        top: 0;
+        right: 0;
+        width: 512px;
+        height: 100%;
+        transform: translateX(100%);
+    }
+
+    .info-panel.open {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 639px) {
+    .info-panel {
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 60%;
+        transform: translateY(100%);
+    }
+
+    .info-panel.open {
+        transform: translateY(0);
+    }
+}
+
+.panel-btn:not(.close) svg {
+    height: 16px;
+    width: 16px;
+}
+
+.panel-btn.close, .panel-btn.bbox, .panel-btn.seg {
+    left: 20px;
+}
+
+.panel-btn.bbox {
+    top: 140px
+}
+
+.panel-btn.seg {
+    top: 190px
+}
+
+.panel-btn.bbox.off, .panel-btn.seg.off {
+    background-color: var(--brand-secondary);
+}
+
+.panel-btn.bbox.off:hover, .panel-btn.seg.off:hover {
+    background-color: var(--brand-primary);
+}
+
+.panel-content {
+    padding: 2.5rem 1rem 1rem;
+    overflow-y: auto;
+}
+
+.info-panel-logo {
+    display: block;
+    height: 32px;
+}
+
+.info-panel-title {
+    display: flex;
+    gap: 10px;
+    justify-content: end;
+    margin-right: 20px !important;
+    margin-block: 0.8em !important;
+}
+
+.info-panel p, .info-panel h2, .info-panel h4, .info-panel span {
+    transform: scaleY(0.95);
+    color: var(--brand-primary);
+    margin: 0;
+}
+
+.info-panel-image {
+    display: block;
+    width: 100%;
+}
+
+.info-panel-details-section {
+    padding: 20px;
+}
+
+.info-panel-details-section:not(:last-child) {
+    border-bottom: 1px solid var(--brand-secondary);
+}
+
+.info-panel p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-panel span {
+  font-weight: 600;
+}
+

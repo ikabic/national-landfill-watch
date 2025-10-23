@@ -9,8 +9,8 @@ import { FaBars } from "react-icons/fa";
 import MarkerCluster from "./MarkerCluster";
 import MapControls from "./MapControls";
 import UserPin from "./UserPin";
-import LandfillDetailsPanel from "./LandfillDetailsPanel";
 import MapLegend from "./MapLegend";
+import InfoPanel from "./InfoPanel";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
@@ -19,6 +19,7 @@ function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   const activeMarkerRef = useRef(null);
   const landfillProximityRef = useRef([]);
@@ -53,6 +54,7 @@ function LandfillMap() {
   const handleMarkerClick = (id) => {
     axios.get(`/api/landfills/${id}`)
       .then(res => setSelectedLandfill(res.data))
+      .then(() => setPanelOpen(true))
       .catch(err => console.error(err));
   };
 
@@ -68,10 +70,12 @@ function LandfillMap() {
 
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
 
-      <button className="panel-btn"><FaBars /></button>
+      {!panelOpen && <button className="panel-btn" onClick={() => setPanelOpen(true)}><FaBars /></button>}
 
       <MapLegend />
     </MapContainer>
+
+    <InfoPanel open={panelOpen} landfill={selectedLandfill} onClose={() => setPanelOpen(false)} />
   </>
 }
 
