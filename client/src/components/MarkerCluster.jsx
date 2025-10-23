@@ -17,7 +17,7 @@ function MarkerCluster({ landfills, handleMarkerClick }) {
   useEffect(() => {
     if (!map) return;
 
-    const markers = L.markerClusterGroup({ chunkedLoading: true, spiderfyOnMaxZoom: false, showCoverageOnHover: true });
+    const markers = L.markerClusterGroup();
 
     landfills.forEach((lf) => {
       const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
