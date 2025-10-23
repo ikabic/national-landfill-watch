@@ -1,7 +1,7 @@
 import { FaArrowRight } from "react-icons/fa";
 import { LuSquareDashed, LuFocus } from "react-icons/lu";
 import { PiPolygonBold } from "react-icons/pi";
-import { MdOutlineFilterCenterFocus } from "react-icons/md";
+import { toDMS } from "../utils/toDMS";
 import { useState } from "react";
 
 import LandfillImageCanvas from "./LandfillImageCanvas";
@@ -47,6 +47,7 @@ function InfoPanel({ open, onClose, landfill }) {
         <div className="info-panel-details">
           <div className="info-panel-details-section">
             <h2>Landfill #{landfill.id}</h2>
+            <p>{toDMS(landfill.centerLat, true)} {toDMS(landfill.centerLon, false)}</p>
             <h4>{`${landfill.status} Landfill`.toUpperCase()}</h4>
           </div>
 
