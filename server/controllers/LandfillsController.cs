@@ -49,6 +49,23 @@ namespace server.controllers
             return Ok(landfills);
         }
 
+        [HttpGet("markers")]
+        public async Task<IActionResult> GetMarkers()
+        {
+            var markers = await _context.Landfills
+                .Select(l => new LandfillMarkerDto
+                {
+                    Id = l.Id,
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    CenterLat = l.CenterLat,
+                    CenterLon = l.CenterLon
+                })
+                .ToListAsync();
+
+            return Ok(markers);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

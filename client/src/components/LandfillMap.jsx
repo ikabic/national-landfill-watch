@@ -49,7 +49,7 @@ function LandfillMap() {
   const circlesRef = useRef([]);
 
   useEffect(() => {
-    axios.get("/api/landfills")
+    axios.get("/api/landfills/markers")
       .then((res) => setLandfills(res.data))
       .catch((err) => console.error(err));
 
