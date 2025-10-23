@@ -21,7 +21,7 @@ function MarkerCluster({ landfills, handleMarkerClick }) {
 
     landfills.forEach((lf) => {
       const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
-      .on("click", () => handleMarkerClick(lf.id));
+      .on("click", () => handleMarkerClick(lf.id, map));
 
       markers.addLayer(marker);
     });

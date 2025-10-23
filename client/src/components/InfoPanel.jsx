@@ -1,6 +1,7 @@
 import { FaArrowRight } from "react-icons/fa";
-import { LuSquareDashed } from "react-icons/lu";
+import { LuSquareDashed, LuFocus } from "react-icons/lu";
 import { PiPolygonBold } from "react-icons/pi";
+import { MdOutlineFilterCenterFocus } from "react-icons/md";
 import { useState } from "react";
 
 import LandfillImageCanvas from "./LandfillImageCanvas";
@@ -10,6 +11,7 @@ import "../css/InfoPanel.css";
 function InfoPanel({ open, onClose, landfill }) {
   const [showBoundingBox, setShowBoundingBox] = useState(true);
   const [showBoundingPolygon, setShowBoundingPolygon] = useState(true);
+  const [enableZoom, setEnableZoom] = useState(false);
 
   if (!landfill) return; // temp
 
@@ -27,6 +29,11 @@ function InfoPanel({ open, onClose, landfill }) {
           title="Show bounding polygon" onClick={() => setShowBoundingPolygon(!showBoundingPolygon)}>
           <PiPolygonBold />
         </button>
+
+        <button className={`panel-btn zoom ${enableZoom ? "on" : ""}`}
+          title="Enable zoom" onClick={() => setEnableZoom(!enableZoom)}>
+          <LuFocus />
+        </button>
       </div>
 
       <div className="info-panel-main">
@@ -35,7 +42,7 @@ function InfoPanel({ open, onClose, landfill }) {
           Serbia Landfill Overview
         </h2>
 
-        {landfill && <LandfillImageCanvas imageName={landfill.imageName} geoJson={landfill.geoJson} showBoundingBox={showBoundingBox} />}
+        {landfill && <LandfillImageCanvas imageName={landfill.imageName} geoJson={landfill.geoJson} showBoundingBox={showBoundingBox} enableZoom={enableZoom} />}
 
         <div className="info-panel-details">
           <div className="info-panel-details-section">

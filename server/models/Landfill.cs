@@ -45,6 +45,9 @@ namespace server.models
             [Column("geojson")]
             public string GeoJson { get; set; } = "{}";
 
+            [Column("segmentation")]
+            public string Segmentation { get; set; } = "{}";
+
             [Column("center_lat")]
             public double? CenterLat { get; set; }
 
@@ -66,7 +69,7 @@ namespace server.models
             [Column("reported_at")]
             public DateTime ReportedAt { get; set; } = DateTime.UtcNow;
 
-        [Column("geom")]
-        public Point? Geom { get; set; }
+            [Column("geom")]
+            public Point? Geom { get; set; }
     }
 }

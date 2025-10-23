@@ -50,23 +50,27 @@
     width: 16px;
 }
 
-.panel-btn.close, .panel-btn.bbox, .panel-btn.seg {
+.panel-btn.close, .panel-btn.bbox, .panel-btn.seg, .panel-btn.zoom {
     left: 20px;
 }
 
 .panel-btn.bbox {
-    top: 140px
+    top: 118px;
 }
 
 .panel-btn.seg {
-    top: 190px
+    top: 168px;
 }
 
-.panel-btn.bbox.off, .panel-btn.seg.off {
+.panel-btn.zoom {
+    top: 218px;
+}
+
+.panel-btn.bbox.off, .panel-btn.seg.off, .panel-btn.zoom.on {
     background-color: var(--brand-secondary);
 }
 
-.panel-btn.bbox.off:hover, .panel-btn.seg.off:hover {
+.panel-btn.bbox.off:hover, .panel-btn.seg.off:hover, .panel-btn.zoom.on:hover {
     background-color: var(--brand-primary);
 }
 

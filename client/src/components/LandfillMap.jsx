@@ -1,6 +1,5 @@
 import axios from "axios";
 import L from "leaflet";
-import * as turf from "@turf/turf";
 
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
@@ -11,6 +10,7 @@ import MapControls from "./MapControls";
 import UserPin from "./UserPin";
 import MapLegend from "./MapLegend";
 import InfoPanel from "./InfoPanel";
+import LandfillProximity from "./LandfillProximity";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
@@ -25,37 +25,33 @@ function LandfillMap() {
   const landfillProximityRef = useRef([]);
 
   useEffect(() => {
-    axios.get("/api/landfills")
+    axios.get("/api/landfills/markers")
       .then((res) => setLandfills(res.data))
       .catch((err) => console.error(err));
 
-    axios.get("/serbia-border.geojson")
+    axios.get("/serbia.geojson")
       .then((res) => {
         const data = res.data;
 
-        if (data.type === "FeatureCollection" && data.features?.length > 0) {
-          let merged = data.features[0];
-          for (let i = 1; i < data.features.length; i++) {
-            try {
-              const a = turf.flatten(merged);
-              const b = turf.flatten(data.features[i]);
-              const unionInput = turf.featureCollection([...a.features, ...b.features]);
-              merged = turf.combine(unionInput);
-              merged = turf.buffer(merged, 0);
-            } catch (err) { console.warn("Union failed for feature", i, err); }
-          }
-          setBorder(merged);
-        } else if (data.type === "Feature") { setBorder(data);
-        } else { console.error("Unexpected GeoJSON structure:", data); }
+        if (data.type === "FeatureCollection" && data.features?.length > 0) setBorder(data.features[0]);
+        else if (data.type === "Feature") setBorder(data);
+        else console.error("Unexpected GeoJSON structure:", data);
       })
       .catch((err) => console.error("Failed to load border:", err));
   }, []);
 
-  const handleMarkerClick = (id) => {
-    axios.get(`/api/landfills/${id}`)
-      .then(res => setSelectedLandfill(res.data))
+  const handleMarkerClick = async (id, map) => {
+    let landfill;
+    await axios.get(`/api/landfills/${id}`)
+      .then(res => { landfill = res.data; setSelectedLandfill(res.data); })
       .then(() => setPanelOpen(true))
       .catch(err => console.error(err));
+
+    if(landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
+    landfillProximityRef.current = [];
+      
+    const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
+    if(area) landfillProximityRef.current.push(...area);
   };
 
   return <>
