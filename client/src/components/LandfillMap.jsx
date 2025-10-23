@@ -72,6 +72,7 @@ function LandfillMap() {
     axios.get(`/api/landfills/${id}`)
       .then(res => {
         const landfill = res.data;
+        landfill.id = id;
         setSelectedLandfill(landfill);
 
         circlesRef.current.forEach(c => map.removeLayer(c));
