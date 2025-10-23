@@ -43,10 +43,10 @@ function LandfillMap() {
   const handleMarkerClick = async (id, map) => {
     let landfill;
     await axios.get(`/api/landfills/${id}`)
-      .then(res => { landfill = res.data; setSelectedLandfill(res.data); })
+      .then(res => { landfill = { ...res.data, id: id }; setSelectedLandfill(landfill); })
       .then(() => setPanelOpen(true))
       .catch(err => console.error(err));
-
+      
     if(landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
     landfillProximityRef.current = [];
       
