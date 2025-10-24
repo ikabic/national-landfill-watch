@@ -6,11 +6,12 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { FaBars } from "react-icons/fa";
 
 import MarkerCluster from "./MarkerCluster";
-import MapControls from "./MapControls";
+import ZoomControls from "./ZoomControls";
 import UserPin from "./UserPin";
 import MapLegend from "./MapLegend";
 import InfoPanel from "./InfoPanel";
 import LandfillProximity from "./LandfillProximity";
+import VerticalToolbar from "./VerticalToolbar";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
@@ -50,19 +51,22 @@ function LandfillMap() {
       .then(res => { landfill = { ...res.data, id: id }; setSelectedLandfill(landfill); })
       .then(() => setPanelOpen(true))
       .catch(err => console.error(err));
-      
-    if(landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
+
+    if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
     landfillProximityRef.current = [];
-      
+
     const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
-    if(area) landfillProximityRef.current.push(...area);
+    if (area) landfillProximityRef.current.push(...area);
   };
 
   return <>
     <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}>
       <TileLayer className="map-tiles" url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
-      <MapControls activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+      <div className="map-controls">
+        <ZoomControls />
+        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+      </div>
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 

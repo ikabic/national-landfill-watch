@@ -53,3 +53,15 @@
   display: flex;
   z-index: 1000;
 }
+
+.map-controls {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 20px;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

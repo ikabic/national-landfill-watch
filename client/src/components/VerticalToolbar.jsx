@@ -1,0 +1,26 @@
+import { useState } from "react";
+import { useMap } from "react-leaflet";
+import { FaMap, FaLayerGroup, FaAngleDown } from "react-icons/fa";
+
+import LocateMeButton from "./LocateMeButton";
+
+import "../css/VerticalToolbar.css";
+
+function VerticalToolbar({ activeMarkerRef, landfillProximityRef }) {
+    const [expanded, setExpanded] = useState(true);
+    const map = useMap();
+
+    return <div className={`toolbar ${expanded ? "expanded" : "collapsed"}`}>
+         <button className={`toolbar-btn toggle ${expanded ? "rotated" : ""}`} onClick={() => setExpanded(!expanded)} title="Toggle toolbar">
+            <FaAngleDown />
+        </button>
+
+        <div className="toolbar-buttons">
+            <button><FaMap onClick={() => map.flyTo([44.8176, 20.4569], 8, { duration: 1.5 })} /></button>
+            <LocateMeButton activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+            <button><FaLayerGroup /></button>
+        </div>
+    </div>
+}
+
+export default VerticalToolbar;
