@@ -181,5 +181,51 @@ namespace server.controllers
 
             return Ok(landfills);
         }
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetNationalStatistics()
+        {
+            var stats = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue && l.TotalMassTon.HasValue)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    TotalLandfills = g.Count(),
+                    AvgAreaM2 = g.Average(x => x.AreaM2) ?? 0,
+                    AvgVolumeM3 = g.Average(x => x.VolumeM3) ?? 0,
+                    AvgTotalMassTon = g.Average(x => x.TotalMassTon) ?? 0,
+                    SumTotalMassTon = g.Sum(x => x.TotalMassTon) ?? 0,
+                    AvgAnnualCH4Tonnes = g.Average(x => x.AnnualCH4Tonnes) ?? 0,
+                    SumAnnualCH4Tonnes = g.Sum(x => x.AnnualCH4Tonnes) ?? 0,
+                    AvgAnnualCO2eTonnes = g.Average(x => x.AnnualCO2eTonnes) ?? 0,
+                    SumAnnualCO2eTonnes = g.Sum(x => x.AnnualCO2eTonnes) ?? 0
+                })
+                .FirstOrDefaultAsync();
+
+            if (stats == null)
+                return NotFound(new { message = "No landfill data found" });
+
+            var topLandfills = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue)
+                .OrderByDescending(l => l.AreaM2)
+                .Take(3)
+                .Select(l => new
+                {
+                    l.Id,
+                    l.ImageName,
+                    l.Status,
+                    l.AreaM2,
+                    l.TotalMassTon,
+                    l.AnnualCH4Tonnes,
+                    l.AnnualCO2eTonnes
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                stats,
+                topLandfills
+            });
+        }
     }
 }
