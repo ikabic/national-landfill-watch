@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect} from "react";
 import { useMap } from "react-leaflet";
 import axios from "axios";
 import L from "leaflet";
@@ -12,33 +12,47 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
     const [expanded, setExpanded] = useState(false);
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    const [debouncedQuery, setDebouncedQuery] = useState(query);
 
     const userIcon = makePinIcon("#b52727ff", "⬤");
     const inputRef = useRef(null);
 
-    const handleSearch = async (e) => {
-       const value = e.target.value;
-       setQuery(value);
+    useEffect(() => {
+       const handler = setTimeout(() => {
+          setDebouncedQuery(query);
+       }, 300); 
 
-       if (value.length < 3) {
+       return () => clearTimeout(handler);
+    }, [query]);
+
+   useEffect(() => {
+      if (debouncedQuery.length < 3) {
          setSuggestions([]);
          return;
-       }
+      }
 
-       try {
+      const fetchSuggestions = async () => {
+      try {
          const res = await axios.get("https://nominatim.openstreetmap.org/search", {
            params: {
-           q: value,
-           format: "json",
-           addressdetails: 1,
-           countrycodes: "RS",
-           limit: 5,
-         },
-        });
+             q: debouncedQuery,
+             format: "json",
+             addressdetails: 1,
+             countrycodes: "RS",
+             limit: 5,
+           },
+          });
          setSuggestions(res.data);
        } catch (err) {
          console.error("Error fetching search suggestions:", err);
        }
+     };
+
+     fetchSuggestions();
+   }, [debouncedQuery]);
+
+    const handleSearch = async (e) => {
+       setQuery(e.target.value);
     };
 
   const map = useMap();
@@ -64,6 +78,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
       setPanelOpen({ state: true, type: "Proximity" });
     }
   };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); 
