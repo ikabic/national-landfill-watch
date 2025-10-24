@@ -77,6 +77,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
             value={query}
             onChange={handleSearch}
             placeholder="Enter your location..."
+            title={query}
           />
           {suggestions.length > 0 && (
             <ul className="suggestions-list">

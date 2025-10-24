@@ -6,10 +6,15 @@
     display: flex;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
+    overflow: visible;
     transition: width 0.3s ease, transform 0.3s ease-in-out;
     background: white;
     align-items: center;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .searchbar.shifted {
@@ -45,6 +50,41 @@
     padding: 0 12px;
     opacity: 1;
     background: transparent;
+    white-space: nowrap;       
+    overflow: hidden;          
+    text-overflow: ellipsis; 
     transform: translateX(0);
     transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  z-index: 9999; 
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  padding: 8px 10px;
+  cursor: pointer;
+  white-space: nowrap;        
+  overflow: hidden;           
+  text-overflow: ellipsis;    
+  max-width: 100%;     
+}
+
+.suggestions-list li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: #eee;
+  white-space: normal;
 }
