@@ -107,6 +107,10 @@
     padding: 20px;
 }
 
+.info-panel-content {
+    border-top: 1px solid var(--brand-secondary);
+}
+
 .info-panel-details-section:not(:last-child) {
     border-bottom: 1px solid var(--brand-secondary);
 }

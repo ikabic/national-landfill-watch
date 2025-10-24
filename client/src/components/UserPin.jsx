@@ -5,7 +5,7 @@ import { makePinIcon } from "../utils/makePinIcon";
 
 import LandfillProximity from "./LandfillProximity";
 
-function UserPin({ activeMarkerRef, landfillProximityRef }) {
+function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen }) {
   const userIcon = makePinIcon("#b52727ff", "⬤");
 
   const map = useMapEvents({
@@ -20,7 +20,10 @@ function UserPin({ activeMarkerRef, landfillProximityRef }) {
       activeMarkerRef.current = newMarker;
 
       const areas = await LandfillProximity(map, e.latlng.lat, e.latlng.lng);
-      if(areas) areas.forEach(area => landfillProximityRef.current.push(area));
+      if (areas) {
+        areas.forEach(area => landfillProximityRef.current.push(area));
+        setPanelOpen({ state: true, type: "Proximity" });
+      }
     }
   });
 
