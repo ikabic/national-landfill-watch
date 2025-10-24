@@ -22,6 +22,7 @@ import "../css/LandfillMap.css";
 
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
+  const [registryLandfills, setRegistryLandfills] = useState([]);
   const [border, setBorder] = useState(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
   const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
@@ -45,7 +46,7 @@ function LandfillMap() {
       .catch((err) => console.error("Failed to load border:", err));
 
     axios.get("/api/registrylandfills/markers")
-      .then((res) => {console.log(res.data)})
+      .then((res) => setRegistryLandfills(res.data))
       .catch((err) => console.error(err));
   }, []);
 
@@ -77,7 +78,7 @@ function LandfillMap() {
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 
-      <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
+      <MarkerCluster landfills={landfills} registryLandfills={registryLandfills} handleMarkerClick={handleMarkerClick} />
 
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} />
 

@@ -1,0 +1,45 @@
+.marker-cluster.marker-cluster-large-registry div,
+.marker-cluster.marker-cluster-large-registry,
+.marker-cluster.marker-cluster-medium-registry div,
+.marker-cluster.marker-cluster-medium-registry,
+.marker-cluster.marker-cluster-small-registry div,
+.marker-cluster.marker-cluster-small-registry,
+.marker-cluster.marker-cluster-large-detected div,
+.marker-cluster.marker-cluster-large-detected,
+.marker-cluster.marker-cluster-medium-detected div,
+.marker-cluster.marker-cluster-medium-detected,
+.marker-cluster.marker-cluster-small-detected div,
+.marker-cluster.marker-cluster-small-detected {
+  color: #fff !important;
+}
+
+
+.marker-cluster.marker-cluster-large-registry div,
+.marker-cluster.marker-cluster-large-registry {
+  background-color: #193a6299 !important;
+}
+
+.marker-cluster.marker-cluster-medium-registry div,
+.marker-cluster.marker-cluster-medium-registry {
+  background-color: #22589a99 !important;
+}
+
+.marker-cluster.marker-cluster-small-registry div,
+.marker-cluster.marker-cluster-small-registry {
+  background-color: #337DD699 !important;
+}
+
+.marker-cluster.marker-cluster-large-detected div,
+.marker-cluster.marker-cluster-large-detected {
+  background-color: #B8320999 !important;
+}
+
+.marker-cluster.marker-cluster-medium-detected div,
+.marker-cluster.marker-cluster-medium-detected {
+  background-color: #D9652899 !important;
+}
+
+.marker-cluster.marker-cluster-small-detected div,
+.marker-cluster.marker-cluster-small-detected {
+  background-color: #FF9F4B99 !important;
+}
