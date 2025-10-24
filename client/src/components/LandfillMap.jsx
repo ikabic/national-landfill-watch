@@ -1,111 +1,95 @@
-import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet.markercluster/dist/MarkerCluster.css";
-import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import "leaflet.markercluster";
 
-import MapControls from "./MapControls";
-import { makePinIcon } from "../utils/makePinIcon";
-import UserPin from "./UserPin";
+import { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { FaBars } from "react-icons/fa";
-import LandfillDetailsPanel from "./LandfillDetailsPanel";
-import * as turf from "@turf/turf";
 
+import MarkerCluster from "./MarkerCluster";
+import ZoomControls from "./ZoomControls";
+import UserPin from "./UserPin";
+import MapLegend from "./MapLegend";
+import LandfillInfoPanel from "./LandfillInfoPanel";
+import SerbiaInfoPanel from "./SerbiaInfoPanel";
+import ProximityInfoPanel from "./ProximityInfoPanel";
+import LandfillProximity from "./LandfillProximity";
+import VerticalToolbar from "./VerticalToolbar";
+import Logo from "./Logo";
+import SearchBar from "./SearchBar";
+
+import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
-
-function MarkerClusterGroupWrapper({ landfills, handleMarkerClick, sanitaryIcon, unsanitaryIcon }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const markers = L.markerClusterGroup();
-
-    landfills.forEach((lf) => {
-      const marker = L.marker([lf.centerLat, lf.centerLon], {
-        icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon
-      }).on("click", () => handleMarkerClick(lf.id));
-
-      markers.addLayer(marker);
-    });
-
-    map.addLayer(markers);
-    return () => map.removeLayer(markers);
-  }, [landfills, map]);
-
-  return null;
-}
 
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
-  const activeMarkerRef = useRef(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
+  const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
 
-  const sanitaryIcon = makePinIcon("#2E7D32", "♻️");
-  const unsanitaryIcon = makePinIcon("#d18135ff", "☣️");
+  const activeMarkerRef = useRef(null);
+  const landfillProximityRef = useRef([]);
 
   useEffect(() => {
-    axios.get("/api/landfills")
+    axios.get("/api/landfills/markers")
       .then((res) => setLandfills(res.data))
       .catch((err) => console.error(err));
 
-    axios.get("/serbia-border.geojson")
+    axios.get("/serbia.geojson")
       .then((res) => {
         const data = res.data;
 
-        if (data.type === "FeatureCollection" && data.features?.length > 0) {
-          let merged = data.features[0];
-          for (let i = 1; i < data.features.length; i++) {
-            try {
-              const a = turf.flatten(merged);
-              const b = turf.flatten(data.features[i]);
-              const unionInput = turf.featureCollection([...a.features, ...b.features]);
-              merged = turf.combine(unionInput);
-              merged = turf.buffer(merged, 0);
-            } catch (err) {
-              console.warn("Union failed for feature", i, err);
-            }
-          }
-          setBorder(merged);
-        } else if (data.type === "Feature") {
-          setBorder(data);
-        } else {
-          console.error("Unexpected GeoJSON structure:", data);
-        }
+        if (data.type === "FeatureCollection" && data.features?.length > 0) setBorder(data.features[0]);
+        else if (data.type === "Feature") setBorder(data);
+        else console.error("Unexpected GeoJSON structure:", data);
       })
       .catch((err) => console.error("Failed to load border:", err));
+
+    axios.get("/api/registrylandfills/markers")
+      .then((res) => {console.log(res.data)})
+      .catch((err) => console.error(err));
   }, []);
 
-  const handleMarkerClick = (id) => {
-    axios.get(`/api/landfills/${id}`)
-      .then(res => setSelectedLandfill(res.data))
+  const handleMarkerClick = async (id, map) => {
+    let landfill;
+    await axios.get(`/api/landfills/${id}`)
+      .then(res => { landfill = { ...res.data, id: id }; setSelectedLandfill(landfill); })
+      .then(() => setPanelOpen({ state: true, type: "Landfill" }))
       .catch(err => console.error(err));
+
+    if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
+    landfillProximityRef.current = [];
+
+    const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
+    if (area) landfillProximityRef.current.push(...area);
   };
 
-  const closePanel = () => setSelectedLandfill(null);
+  return <>
+    <Logo />
+    <SearchBar panelOpen={panelOpen.state} />
 
-  return (
-    <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false}>
-      <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+    <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}>
+      <TileLayer className="map-tiles" url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
 
-      <MapControls activeMarkerRef={activeMarkerRef} />
+      <div className="map-controls">
+        <ZoomControls />
+        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+      </div>
 
-      {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#d18135ff", weight: 2, fillOpacity: 0 }} />}
+      {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 
-      <MarkerClusterGroupWrapper
-        landfills={landfills}
-        handleMarkerClick={handleMarkerClick}
-        sanitaryIcon={sanitaryIcon}
-        unsanitaryIcon={unsanitaryIcon}
-      />
+      <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
 
-      {selectedLandfill && <LandfillDetailsPanel landfill={selectedLandfill} onClose={closePanel} />}
-      <UserPin activeMarkerRef={activeMarkerRef} />
-      <button className="panel-btn"><FaBars /></button>
+      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} />
+
+      {!panelOpen.state && <button className="panel-btn" onClick={() => setPanelOpen({ state: true, type: "Serbia" })}><FaBars /></button>}
+
+      <MapLegend />
     </MapContainer>
-  );
+
+    <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
+    <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
+    <ProximityInfoPanel open={panelOpen.type === "Proximity" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
+  </>
 }
 
 export default LandfillMap;

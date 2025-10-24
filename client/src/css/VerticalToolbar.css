@@ -1,0 +1,51 @@
+.toolbar {
+    position: fixed;
+    top: 76px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background-color: var(--brand-primary);
+    border-radius: 6px;
+    align-items: middle;
+    transition: height 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden
+}
+
+.toolbar.expanded {
+    height: 139px;
+}
+
+.toolbar.collapsed {
+    height: 32px;
+}
+
+.toolbar.collapsed .toolbar-buttons {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toolbar-buttons {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.toolbar button {
+    box-shadow: none;
+}
+
+.toolbar-btn.toggle {
+    position: fixed;
+    top: 76px;
+    left: 0px;
+}
+
+
+.toolbar-btn.toggle svg {
+    transition: transform 0.3s ease;
+}
+
+.toolbar-btn.toggle.rotated svg {
+    transform: rotate(180deg);
+}

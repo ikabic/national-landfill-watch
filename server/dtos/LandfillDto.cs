@@ -2,6 +2,7 @@ namespace server.dtos
 {
     public class LandfillDto
     {
+        public int Id { get; set; }
         public string ImageName { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public int StartYear { get; set; }
@@ -13,6 +14,7 @@ namespace server.dtos
         public double? AnnualCH4Tonnes { get; set; }
         public double? AnnualCO2eTonnes { get; set; }
         public string GeoJson { get; set; } = "{}";
+        public string Segmentation { get; set; } = "{}";
         public double? CenterLat { get; set; }
         public double? CenterLon { get; set; }
         public double? CenterX { get; set; }

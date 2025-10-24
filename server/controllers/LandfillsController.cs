@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.data;
-using server.dtos; 
+using server.dtos;
+using server.models;
+using Newtonsoft.Json.Linq;
+using System.Data.Common;
 
 namespace server.controllers
 {
@@ -19,17 +22,82 @@ namespace server.controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var landfills = await _context.Landfills.ToListAsync();
+            var landfills = await _context.Landfills
+                .Select(l => new LandfillDto
+                {
+                    Id = l.Id,
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    StartYear = l.StartYear,
+                    LifeYears = l.LifeYears,
+                    AreaM2 = l.AreaM2,
+                    VolumeM3 = l.VolumeM3,
+                    TotalMassTon = l.TotalMassTon,
+                    AnnualMswM3 = l.AnnualMswM3,
+                    AnnualCH4Tonnes = l.AnnualCH4Tonnes,
+                    AnnualCO2eTonnes = l.AnnualCO2eTonnes,
+                    GeoJson = l.GeoJson,
+                    CenterLat = l.CenterLat,
+                    CenterLon = l.CenterLon,
+                    CenterX = l.CenterX,
+                    CenterY = l.CenterY,
+                    Width = l.Width,
+                    Height = l.Height
+                })
+                .ToListAsync();
+
             return Ok(landfills);
+        }
+
+        [HttpGet("markers")]
+        public async Task<IActionResult> GetMarkers()
+        {
+            var markers = await _context.Landfills
+                .Select(l => new LandfillMarkerDto
+                {
+                    Id = l.Id,
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    CenterLat = l.CenterLat,
+                    CenterLon = l.CenterLon
+                })
+                .ToListAsync();
+
+            return Ok(markers);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var landfill = await _context.Landfills.FindAsync(id);
-            if (landfill == null)
+            var landfillDto = await _context.Landfills
+                .Where(l => l.Id == id)
+                .Select(l => new LandfillDto
+                {
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    StartYear = l.StartYear,
+                    LifeYears = l.LifeYears,
+                    AreaM2 = l.AreaM2,
+                    VolumeM3 = l.VolumeM3,
+                    TotalMassTon = l.TotalMassTon,
+                    AnnualMswM3 = l.AnnualMswM3,
+                    AnnualCH4Tonnes = l.AnnualCH4Tonnes,
+                    AnnualCO2eTonnes = l.AnnualCO2eTonnes,
+                    GeoJson = l.GeoJson,
+                    Segmentation = l.Segmentation,
+                    CenterLat = l.CenterLat,
+                    CenterLon = l.CenterLon,
+                    CenterX = l.CenterX,
+                    CenterY = l.CenterY,
+                    Width = l.Width,
+                    Height = l.Height
+                })
+                .FirstOrDefaultAsync();
+
+            if (landfillDto == null)
                 return NotFound();
-            return Ok(landfill);
+
+            return Ok(landfillDto);
         }
 
         [HttpPost]
@@ -59,8 +127,8 @@ namespace server.controllers
         [HttpPost("import")]
         public async Task<IActionResult> ImportLandfills([FromBody] List<LandfillDto> landfills)
         {
-             foreach (var lf in landfills)
-             {
+            foreach (var lf in landfills)
+            {
                 var entity = new Landfill
                 {
                     ImageName = lf.ImageName,
@@ -81,11 +149,104 @@ namespace server.controllers
                     Width = lf.Width,
                     Height = lf.Height
                 };
-               _context.Landfills.Add(entity);
+
+                _context.Landfills.Add(entity);
             }
+
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Landfills imported successfully" });
         }
 
+        [HttpGet("check-point")]
+        public async Task<IActionResult> CheckPoint([FromQuery] double lat, [FromQuery] double lon)
+        {
+            var landfills = await _context.LandfillCheckPointDto
+                .FromSqlInterpolated($@"
+                    SELECT 
+                        l.id AS ""Id"",
+                        l.image_name AS ""ImageName"",
+                        l.status AS ""Status"",
+                        l.start_year AS ""StartYear"",
+                        (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision AS ""InfluenceRadius"",
+                        l.center_lat AS ""CenterLat"",
+                        l.center_lon AS ""CenterLon""
+                    FROM ""landfills"" AS l
+                    WHERE ST_DWithin(
+                        geom,
+                        ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography,
+                        (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision
+                    )
+                ")
+                .ToListAsync();
+
+            return Ok(landfills);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetNationalStatistics()
+        {
+            var stats = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue && l.TotalMassTon.HasValue)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    TotalLandfills = g.Count(),
+                    AvgAreaM2 = g.Average(x => x.AreaM2) ?? 0,
+                    AvgVolumeM3 = g.Average(x => x.VolumeM3) ?? 0,
+                    AvgTotalMassTon = g.Average(x => x.TotalMassTon) ?? 0,
+                    SumTotalMassTon = g.Sum(x => x.TotalMassTon) ?? 0,
+                    AvgAnnualCH4Tonnes = g.Average(x => x.AnnualCH4Tonnes) ?? 0,
+                    SumAnnualCH4Tonnes = g.Sum(x => x.AnnualCH4Tonnes) ?? 0,
+                    AvgAnnualCO2eTonnes = g.Average(x => x.AnnualCO2eTonnes) ?? 0,
+                    SumAnnualCO2eTonnes = g.Sum(x => x.AnnualCO2eTonnes) ?? 0
+                })
+                .FirstOrDefaultAsync();
+
+            if (stats == null)
+                return NotFound(new { message = "No landfill data found" });
+
+            var topLandfills = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue)
+                .OrderByDescending(l => l.AreaM2)
+                .Take(3)
+                .Select(l => new
+                {
+                    l.Id,
+                    l.ImageName,
+                    l.Status,
+                    l.AreaM2,
+                    l.TotalMassTon,
+                    l.AnnualCH4Tonnes,
+                    l.AnnualCO2eTonnes
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                stats,
+                topLandfills
+            });
+        }
+
+        [HttpGet("chart-data")]
+        public async Task<IActionResult> GetChartData()
+        {
+            var chartData = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue && l.VolumeM3.HasValue && l.TotalMassTon.HasValue)
+                .Select(l => new
+                {
+                    l.AreaM2,
+                    l.VolumeM3,
+                    l.TotalMassTon,
+                    l.AnnualCH4Tonnes,
+                    l.AnnualCO2eTonnes
+                })
+                .ToListAsync();
+
+            if (!chartData.Any())
+                return NotFound(new { message = "No landfill data found" });
+
+            return Ok(chartData);
+        }
     }
 }

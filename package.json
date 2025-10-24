@@ -25,10 +25,5 @@
     "concurrently": "^9.2.1"
   },
   "dependencies": {
-    "@turf/turf": "^7.2.0",
-    "leaflet": "^1.9.4",
-    "leaflet.markercluster": "^1.5.3",
-    "react-leaflet": "^4.2.1",
-    "react-leaflet-cluster": "^3.1.1"
   }
 }
