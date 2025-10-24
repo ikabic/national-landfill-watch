@@ -9,7 +9,9 @@ import MarkerCluster from "./MarkerCluster";
 import ZoomControls from "./ZoomControls";
 import UserPin from "./UserPin";
 import MapLegend from "./MapLegend";
-import InfoPanel from "./InfoPanel";
+import LandfillInfoPanel from "./LandfillInfoPanel";
+import SerbiaInfoPanel from "./SerbiaInfoPanel";
+import ProximityInfoPanel from "./ProximityInfoPanel";
 import LandfillProximity from "./LandfillProximity";
 import VerticalToolbar from "./VerticalToolbar";
 import Logo from "./Logo";
@@ -21,7 +23,7 @@ function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
   const [border, setBorder] = useState(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
 
   const activeMarkerRef = useRef(null);
   const landfillProximityRef = useRef([]);
@@ -50,7 +52,7 @@ function LandfillMap() {
     let landfill;
     await axios.get(`/api/landfills/${id}`)
       .then(res => { landfill = { ...res.data, id: id }; setSelectedLandfill(landfill); })
-      .then(() => setPanelOpen(true))
+      .then(() => setPanelOpen({ state: true, type: "Landfill" }))
       .catch(err => console.error(err));
 
     if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
@@ -75,14 +77,16 @@ function LandfillMap() {
 
       <MarkerCluster landfills={landfills} handleMarkerClick={handleMarkerClick} />
 
-      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} />
 
-      {!panelOpen && <button className="panel-btn" onClick={() => setPanelOpen(true)}><FaBars /></button>}
+      {!panelOpen.state && <button className="panel-btn" onClick={() => setPanelOpen({ state: true, type: "Serbia" })}><FaBars /></button>}
 
       <MapLegend />
     </MapContainer>
 
-    <InfoPanel open={panelOpen} landfill={selectedLandfill} onClose={() => setPanelOpen(false)} />
+    {panelOpen.type == "Landfill" && <LandfillInfoPanel open={panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
+    {panelOpen.type == "Serbia" && <SerbiaInfoPanel open={panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
+    {panelOpen.type == "Proximity" && <ProximityInfoPanel open={panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
   </>
 }
 
