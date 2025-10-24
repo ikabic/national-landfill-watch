@@ -38,6 +38,10 @@ function LandfillMap() {
         else console.error("Unexpected GeoJSON structure:", data);
       })
       .catch((err) => console.error("Failed to load border:", err));
+
+    axios.get("/api/registrylandfills/markers")
+      .then((res) => {console.log(res.data)})
+      .catch((err) => console.error(err));
   }, []);
 
   const handleMarkerClick = async (id, map) => {
