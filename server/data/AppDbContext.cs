@@ -9,7 +9,7 @@ namespace server.data
     public class AppDbContext : DbContext
     {
         public DbSet<Landfill> Landfills { get; set; }
-        public DbSet<RegisterLandfill> RegisterLandfills { get; set; }
+        public DbSet<RegistryLandfill> RegistryLandfills { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -24,7 +24,7 @@ namespace server.data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Landfill>().ToTable("landfills");
-            modelBuilder.Entity<RegisterLandfill>().ToTable("register_landfills"); // poveži model s tabelom
+            modelBuilder.Entity<RegistryLandfill>().ToTable("registry_landfills"); 
 
             modelBuilder.Entity<Landfill>(entity =>
             {

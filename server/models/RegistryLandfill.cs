@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace server.models
 {
-    [Table("register_landfills")]
-    public class RegisterLandfill
+    [Table("registry_landfills")]
+    public class RegistryLandfill
     {
         [Key]
         [Column("id")]
         public int Id { get; set; }
 
         [Column("type")]
-        public string Type { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
 
         [Column("lat")]
         public double Lat { get; set; }
