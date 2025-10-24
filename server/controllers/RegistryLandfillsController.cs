@@ -31,10 +31,13 @@ namespace server.controllers
                 .Select(l => new RegistryLandfillMarkerDto
                 {
                     Id = l.Id,
-                    ImageName = null,
+                    ImageName = l.ImageName,
                     Status = l.Status,
                     CenterLat = l.Lat,
-                    CenterLon = l.Lon
+                    CenterLon = l.Lon,
+                    CenterXPx = l.CenterXPx,
+                    CenterYPx = l.CenterYPx,
+                    Radius = l.Radius
                 })
                 .ToListAsync();
 

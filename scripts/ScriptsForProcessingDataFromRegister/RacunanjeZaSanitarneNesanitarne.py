@@ -24,8 +24,8 @@ def calc_fod_emission(amsw, k, years, mcf, doc, f, co2_eq):
     return round(annual_ch4, 2), round(annual_co2e, 2)
 
 #OVDE UNOS FAJLA NA KOM SE RADI
-input_file = "divlje_deponije.csv"
-output_file = "divlje_deponije_final2.csv"
+input_file = "sanitarne_deponije.csv"
+output_file = "sanitarne_deponije_final.csv"
 df = pd.read_csv(input_file)
 
 results = []

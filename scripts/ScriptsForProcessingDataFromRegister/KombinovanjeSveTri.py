@@ -5,7 +5,7 @@ divlje_file = "divlje_deponije_final.csv"
 sanitarne_file = "sanitarne_deponije_final.csv"
 nesanitarne_file = "nesanitarne_deponije_final.csv"
 
-output_file = "final.csv"
+output_file = "combined.csv"
 
 
 dfs = []

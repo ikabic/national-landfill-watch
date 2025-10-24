@@ -8,3 +8,13 @@ Samo treba da se pokrenu iz ovog foldera i na osnovu .xlsx fajlova, koji su javn
 PRE pokretanja RacunanjeZaSanitarneNesanitarne uci u kod i namestiti file name od one za koje treba da se racuna finalni csv.
 
 Finalni csv su csvovi izracunati sa svime potrebnim, dok oni bez final imaju samo osnovne informacije.
+
+
+REDOM POZVATI 
+1. VrstaUCSV za sve tri, 
+2. RacunanjeZaDivlje i RacunanjeZaSanitarneNesanitarne dva puta, sa menjanjem imena fajlova,
+3. KombinovanjeSveTri,
+4. Formatiranje,
+5. DodavanjeTileova
+
+Sve je u finalu
