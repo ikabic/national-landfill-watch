@@ -7,5 +7,8 @@ namespace server.dtos
         public string? Status { get; set; }
         public double? CenterLat { get; set; }
         public double? CenterLon { get; set; }
+        public double? CenterXPx { get; set; }
+        public double? CenterYPx { get; set; }
+        public double? Radius { get; set; }
     }
 }
