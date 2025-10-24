@@ -42,5 +42,17 @@ namespace server.models
 
         [Column("annual_co2e_tonnes")]
         public double AnnualCO2eTonnes { get; set; }
+
+        [Column("center_x_px")]
+        public double CenterXPx { get; set; }
+
+        [Column("center_y_px")]
+        public double CenterYPx { get; set; }
+
+        [Column("image_name")]
+        public string ImageName { get; set; } = string.Empty;
+        //RADIUS-POLUPRECNIK KRUGA KOJI OBUHVATA DEPOONIJU 
+        [Column("radius")]
+        public double Radius { get; set; }
     }
 }
