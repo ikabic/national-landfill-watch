@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMap } from "react-leaflet";
 import axios from "axios";
 import L from "leaflet";
@@ -14,6 +14,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
     const [suggestions, setSuggestions] = useState([]);
 
     const userIcon = makePinIcon("#b52727ff", "⬤");
+    const inputRef = useRef(null);
 
     const handleSearch = async (e) => {
        const value = e.target.value;
@@ -63,6 +64,14 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
       setPanelOpen({ state: true, type: "Proximity" });
     }
   };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); 
+      if (suggestions.length > 0) {
+        handleSelect(suggestions[0]); 
+      }
+    }
+  };
 
     return (
     <div className={`searchbar ${panelOpen ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`}>
@@ -73,9 +82,12 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
       {expanded && (
         <div className="search-input-wrapper">
           <input
+            ref={inputRef}    
             type="text"
             value={query}
             onChange={handleSearch}
+            onKeyDown={handleKeyDown}
+            onFocus={() => inputRef.current?.select()}
             placeholder="Enter your location..."
             title={query}
           />
