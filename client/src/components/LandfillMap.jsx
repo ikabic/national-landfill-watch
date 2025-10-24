@@ -86,9 +86,9 @@ function LandfillMap() {
       <MapLegend />
     </MapContainer>
 
-    {panelOpen.type == "Landfill" && <LandfillInfoPanel open={panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
-    {panelOpen.type == "Serbia" && <SerbiaInfoPanel open={panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
-    {panelOpen.type == "Proximity" && <ProximityInfoPanel open={panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} /> }
+    <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
+    <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
+    <ProximityInfoPanel open={panelOpen.type === "Proximity" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
   </>
 }
 
