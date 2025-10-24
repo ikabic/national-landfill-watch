@@ -23,7 +23,7 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
                     <LuSquareDashed />
                 </button>
 
-                <button className={`panel-btn seg ${showBoundingPolygon ? "" : "off"}`}
+                <button className={`panel-btn seg ${showBoundingPolygon ? "on" : ""}`}
                     title="Show bounding polygon" onClick={() => setShowBoundingPolygon(!showBoundingPolygon)}>
                     <PiPolygonBold />
                 </button>
