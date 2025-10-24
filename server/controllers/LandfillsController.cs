@@ -227,5 +227,26 @@ namespace server.controllers
                 topLandfills
             });
         }
+
+        [HttpGet("chart-data")]
+        public async Task<IActionResult> GetChartData()
+        {
+            var chartData = await _context.Landfills
+                .Where(l => l.AreaM2.HasValue && l.VolumeM3.HasValue && l.TotalMassTon.HasValue)
+                .Select(l => new
+                {
+                    l.AreaM2,
+                    l.VolumeM3,
+                    l.TotalMassTon,
+                    l.AnnualCH4Tonnes,
+                    l.AnnualCO2eTonnes
+                })
+                .ToListAsync();
+
+            if (!chartData.Any())
+                return NotFound(new { message = "No landfill data found" });
+
+            return Ok(chartData);
+        }
     }
 }
