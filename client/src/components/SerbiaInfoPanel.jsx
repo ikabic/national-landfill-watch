@@ -1,9 +1,11 @@
-import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import InfoPanel from "./InfoPanel";
 import Chart from "chart.js/auto";
 
-import "../css/LandfillInfoPanel.css"
+import { useEffect, useState, useRef } from "react";
+
+import InfoPanel from "./InfoPanel";
+
+import "../css/InfoPanel.css"
 
 function SerbiaInfoPanel({ open, onClose }) {
     const [stats, setStats] = useState(null);
@@ -12,9 +14,7 @@ function SerbiaInfoPanel({ open, onClose }) {
     const [topLandfills, setTopLandfills] = useState([]);
     const [chartData, setChartData] = useState([]);
 
-    const areaChartRef = useRef(null);
     const massChartRef = useRef(null);
-    const areaChartInstance = useRef(null);
     const massChartInstance = useRef(null);
 
     useEffect(() => {
@@ -24,15 +24,15 @@ function SerbiaInfoPanel({ open, onClose }) {
         setError(null);
 
         axios.get("/api/landfills/statistics")
-        .then(res => {
-            setStats(res.data.stats);
-            setTopLandfills(res.data.topLandfills);
-        })
-        .catch(err => {
-            console.error("Failed to load statistics:", err);
-            setError("Failed to load statistics");
-        })
-        .finally(() => setLoading(false));
+            .then(res => {
+                setStats(res.data.stats);
+                setTopLandfills(res.data.topLandfills);
+            })
+            .catch(err => {
+                console.error("Failed to load statistics:", err);
+                setError("Failed to load statistics");
+            })
+            .finally(() => setLoading(false));
     }, [open]);
 
     useEffect(() => {
@@ -51,12 +51,11 @@ function SerbiaInfoPanel({ open, onClose }) {
         const createHistogram = (values, bins) => {
             const counts = new Array(bins.length - 1).fill(0);
             values.forEach(v => {
-                for (let i = 0; i < bins.length - 1; i++) {
+                for (let i = 0; i < bins.length - 1; i++)
                     if (v >= bins[i] && v < bins[i + 1]) {
                         counts[i]++;
                         break;
                     }
-                }
             });
             const labels = bins.slice(0, -1).map((b, i) => `${bins[i]}-${bins[i + 1]}`);
             return { counts, labels };
@@ -73,8 +72,8 @@ function SerbiaInfoPanel({ open, onClose }) {
                 datasets: [{
                     label: "Number of Landfills",
                     data: massHist.counts,
-                    backgroundColor: "rgba(255, 99, 132, 0.5)",
-                    borderColor: "rgba(255, 99, 132, 1)",
+                    backgroundColor: "#864c1988",
+                    borderColor: "#864c19",
                     borderWidth: 1
                 }]
             },
@@ -90,50 +89,58 @@ function SerbiaInfoPanel({ open, onClose }) {
 
     }, [chartData]);
 
-    return (
-        <InfoPanel title="Serbia Overview" open={open} onClose={onClose}>
+    return <InfoPanel title="Serbia Overview" open={open} onClose={onClose}>
         {loading && <p>Loading statistics...</p>}
         {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-        {stats && (
-            <div className="stats-grid">
-                <div><strong>Total Landfills:</strong> {stats.totalLandfills}</div>
-                <div><strong>Avg. Area (m²):</strong> {stats.avgAreaM2.toFixed(2)}</div>
-                <div><strong>Avg. Volume (m³):</strong> {stats.avgVolumeM3.toFixed(2)}</div>
-                <div><strong>Avg. Mass (t):</strong> {stats.avgTotalMassTon.toFixed(2)}</div>
-                <div><strong>Total Mass (t):</strong> {stats.sumTotalMassTon.toFixed(2)}</div>
-                <div><strong>Avg. Annual CH₄ (t):</strong> {stats.avgAnnualCH4Tonnes.toFixed(2)}</div>
-                <div><strong>Total Annual CH₄ (t):</strong> {stats.sumAnnualCH4Tonnes.toFixed(2)}</div>
-                <div><strong>Avg. Annual CO₂e (t):</strong> {stats.avgAnnualCO2eTonnes.toFixed(2)}</div>
-                <div><strong>Total Annual CO₂e (t):</strong> {stats.sumAnnualCO2eTonnes.toFixed(2)}</div>
-            </div>
-        )}
+        <div className="info-panel-details" id="serbia">
+            {stats && <>
+                <div className="info-panel-details-section">
+                    <span>Total Landfills: {stats.totalLandfills}</span>
+                </div>
 
-        {topLandfills.length > 0 && (
-            <div className="top-landfills">
-            <h3>Top 3 Largest Landfills by Area</h3>
-            <ul>
-                {topLandfills.map(lf => (
-                <li key={lf.id}>
-                    Landfill ID <strong>{lf.id}</strong> ({lf.status}) - 
-                    Area: {lf.areaM2?.toFixed(2)} m², 
-                    Mass: {lf.totalMassTon?.toFixed(2)} t, 
-                    CH₄: {lf.annualCH4Tonnes?.toFixed(2)} t, 
-                    CO₂e: {lf.annualCO2eTonnes?.toFixed(2)} t
-                </li>
-                ))}
-            </ul>
-            </div>
-        )}
+                <div className="info-panel-details-section">
+                    <p>Average area<span> {stats.avgAreaM2.toFixed(2)} m²</span></p>
+                    <p>Average volume<span> {stats.avgVolumeM3.toFixed(2)} m³</span></p>
+                </div>
 
-        {chartData.length > 0 && (
-            <div className="charts-container">
-                <h3>Landfill Mass Distribution</h3>
+                <div className="info-panel-details-section">
+                    <p>Average mass<span> {stats.avgTotalMassTon.toFixed(2)} ton</span></p>
+                    <p>Total mass<span> {stats.sumTotalMassTon.toFixed(2)} ton</span></p>
+                </div>
+
+                <div className="info-panel-details-section">
+                    <p>Average CH₄ emissions<span> {stats.avgAnnualCH4Tonnes.toFixed(2)} ton/year</span></p>
+                    <p>Total CH₄ emissions<span> {stats.sumAnnualCH4Tonnes.toFixed(2)} ton/year</span></p>
+                    <br />
+                    <p>Average CH₄ emissions (CO₂eq)<span> {stats.avgAnnualCO2eTonnes.toFixed(2)} ton/year</span></p>
+                    <p>Total CH₄ emissions (CO₂eq)<span> {stats.sumAnnualCO2eTonnes.toFixed(2)} ton/year</span></p>
+                </div>
+            </>
+            }
+
+            {topLandfills.length > 0 && <div className="info-panel-details-section">
+                <span>Top 3 Largest Landfills by Area</span>
+                {topLandfills.map(lf => <div key={lf.id} className="info-panel-listitem">
+                    <span className="route">{lf.status} Landfill ID {lf.id}</span>
+                    <p style={{ justifyContent: "center" }}><small>
+                        Area: {lf.areaM2?.toFixed(2)} m²&nbsp;&nbsp;•&nbsp;&nbsp;
+                        Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;&nbsp;
+                        CH₄: {lf.annualCH4Tonnes?.toFixed(2)} ton
+                    </small></p>
+                </div>
+                )}
+            </div>
+            }
+
+            {chartData.length > 0 && <div className="info-panel-details-section">
+                <span>Landfill Mass Distribution</span>
+                <br />
                 <canvas ref={massChartRef}></canvas>
             </div>
-        )}
-        </InfoPanel>
-    );
+            }
+        </div>
+    </InfoPanel>
 }
 
 export default SerbiaInfoPanel;

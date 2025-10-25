@@ -156,3 +156,12 @@
     font-weight: 600;
     justify-content: center;
 }
+
+.info-panel span.route:hover {
+    color: var(--brand-secondary);
+    cursor: pointer;
+}
+
+.info-panel-listitem {
+    margin: 16px 0;
+}
