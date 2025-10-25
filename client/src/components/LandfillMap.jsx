@@ -109,6 +109,12 @@ function MapReadyHelper({ onReady }) {
   return null;
 }
 
+useEffect(() => {
+  if (proximityLandfills.length > 0) {
+    setPanelOpen({ state: true, type: "Proximity" });
+  }
+}, [proximityLandfills]);
+
   return <>
     <Logo />
 
@@ -116,9 +122,9 @@ function MapReadyHelper({ onReady }) {
       <TileLayer className="map-tiles" url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
       <MapReadyHelper onReady={(mapInstance) => {
           mapRef.current = mapInstance;
-          console.log("✅ Leaflet map ready:", mapInstance);
+          console.log("Leaflet map ready:", mapInstance);
       }} />
-      <SearchBar panelOpen={panelOpen.state} mapRefs={{ activeMarkerRef, landfillProximityRef }} setPanelOpen={setPanelOpen} />
+      <SearchBar panelOpen={panelOpen} mapRefs={{ map: mapRef, activeMarkerRef, landfillProximityRef }} setPanelOpen={setPanelOpen} setProximityLandfills={setProximityLandfills} />
 
       <div className="map-controls">
         <ZoomControls />

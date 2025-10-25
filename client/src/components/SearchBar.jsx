@@ -1,5 +1,6 @@
 import axios from "axios";
 import L from "leaflet";
+import { haversineDistance } from "../utils/distance";
 
 import { useState, useRef, useEffect } from "react";
 import { useMap } from "react-leaflet";
@@ -11,7 +12,7 @@ import LandfillProximity from "./LandfillProximity";
 
 import "../css/SearchBar.css";
 
-function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
+function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) {
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -19,7 +20,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
 
   const userIcon = makePinIcon("#b52727ff", "⬤");
   const inputRef = useRef(null);
-  const map = useMap();
+  const map = mapRefs.map.current;
 
   const { enableMapInteractions, disableMapInteractions } = handleMapInteractions({ map });
 
@@ -50,6 +51,8 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
     setQuery(place.display_name);
     setSuggestions([]);
     enableMapInteractions();
+    const map = mapRefs.map.current;
+    if (!map) return;
 
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
@@ -61,13 +64,32 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
     const newMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
     mapRefs.activeMarkerRef.current = newMarker;
 
-    map.setView([lat, lon], 13);
+    map.setView([lat, lon], 16);
+    const landfills = await LandfillProximity(map, lat, lon); 
+    if (!landfills || landfills.length === 0) {
+       const res = await axios.get("/api/landfills/markers");
+       const allLandfills = res.data;
 
-    const areas = await LandfillProximity(map, lat, lon);
-    if (areas) {
-      areas.forEach((area) => mapRefs.landfillProximityRef.current.push(area));
+       const nearest = allLandfills
+          .map(lf => ({
+              ...lf,
+              distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon),
+              id: lf.id,
+              source: "detected"
+         }))
+         .sort((a, b) => a.distance - b.distance)
+         .slice(0, 3);
+
+      setProximityLandfills(nearest);
+      
+       setPanelOpen({ state: true, type: "Proximity" });
+     } else {
+ 
+       setProximityLandfills(landfills);
+       landfills.forEach(lf => {if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area);});
       setPanelOpen({ state: true, type: "Proximity" });
-    }
+     }
+
   };
 
   const handleKeyDown = (e) => {
@@ -77,7 +99,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
     }
   };
 
-  return <div className={`searchbar ${panelOpen ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
+  return <div className={`searchbar ${panelOpen.state ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
     <button onClick={() => setExpanded(!expanded)}> <FaSearch /> </button>
 
     {expanded && (
