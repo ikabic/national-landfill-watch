@@ -10,7 +10,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen }) {
 
   const map = useMapEvents({
     click: async (e) => {
-      if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn")) return;
+      if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn, .searchbar")) return;
       if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
 
       landfillProximityRef.current.forEach(c => map.removeLayer(c));

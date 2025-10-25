@@ -1,64 +1,55 @@
-import { useState, useRef, useEffect} from "react";
-import { useMap } from "react-leaflet";
 import axios from "axios";
 import L from "leaflet";
+
+import { useState, useRef, useEffect } from "react";
+import { useMap } from "react-leaflet";
 import { FaSearch } from "react-icons/fa";
-import LandfillProximity from "./LandfillProximity";
 import { makePinIcon } from "../utils/makePinIcon";
+import { handleMapInteractions } from "../utils/handleMapInteractions";
+
+import LandfillProximity from "./LandfillProximity";
 
 import "../css/SearchBar.css";
 
 function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
-    const [expanded, setExpanded] = useState(false);
-    const [query, setQuery] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
-    const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [expanded, setExpanded] = useState(false);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-    const userIcon = makePinIcon("#b52727ff", "⬤");
-    const inputRef = useRef(null);
+  const userIcon = makePinIcon("#b52727ff", "⬤");
+  const inputRef = useRef(null);
+  const map = useMap();
 
-    useEffect(() => {
-       const handler = setTimeout(() => {
-          setDebouncedQuery(query);
-       }, 300); 
+  const { enableMapInteractions, disableMapInteractions } = handleMapInteractions({ map });
 
-       return () => clearTimeout(handler);
-    }, [query]);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(handler);
+  }, [query]);
 
-   useEffect(() => {
-      if (debouncedQuery.length < 3) {
-         setSuggestions([]);
-         return;
-      }
+  useEffect(() => {
+    if (debouncedQuery.length < 3) {
+      setSuggestions([]);
+      return;
+    }
 
-      const fetchSuggestions = async () => {
+    const fetchSuggestions = async () => {
       try {
-         const res = await axios.get("https://nominatim.openstreetmap.org/search", {
-           params: {
-             q: debouncedQuery,
-             format: "json",
-             addressdetails: 1,
-             countrycodes: "RS",
-             limit: 5,
-           },
-          });
-         setSuggestions(res.data);
-       } catch (err) {
-         console.error("Error fetching search suggestions:", err);
-       }
-     };
-
-     fetchSuggestions();
-   }, [debouncedQuery]);
-
-    const handleSearch = async (e) => {
-       setQuery(e.target.value);
+        const res = await axios.get("https://nominatim.openstreetmap.org/search", {
+          params: { q: debouncedQuery, format: "json", addressdetails: 1, countrycodes: "RS", limit: 5 }
+        });
+        setSuggestions(res.data);
+      } catch (err) { console.error("Error fetching search suggestions:", err); }
     };
 
-  const map = useMap();
+    fetchSuggestions();
+  }, [debouncedQuery]);
+
   const handleSelect = async (place) => {
     setQuery(place.display_name);
     setSuggestions([]);
+    enableMapInteractions();
 
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
@@ -81,44 +72,27 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); 
-      if (suggestions.length > 0) {
-        handleSelect(suggestions[0]); 
-      }
+      e.preventDefault();
+      if (suggestions.length > 0) handleSelect(suggestions[0]);
     }
   };
 
-    return (
-    <div className={`searchbar ${panelOpen ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`}>
-      <button onClick={() => setExpanded(!expanded)}>
-        <FaSearch />
-      </button>
+  return <div className={`searchbar ${panelOpen ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
+    <button onClick={() => setExpanded(!expanded)}> <FaSearch /> </button>
 
-      {expanded && (
-        <div className="search-input-wrapper">
-          <input
-            ref={inputRef}    
-            type="text"
-            value={query}
-            onChange={handleSearch}
-            onKeyDown={handleKeyDown}
-            onFocus={() => inputRef.current?.select()}
-            placeholder="Enter your location..."
-            title={query}
-          />
-          {suggestions.length > 0 && (
-            <ul className="suggestions-list">
-              {suggestions.map((place, idx) => (
-                <li key={idx} onClick={() => handleSelect(place)}>
-                  {place.display_name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
-  );
+    {expanded && (
+      <div className="search-input-wrapper">
+        <input ref={inputRef} type="text" value={query} title={query} placeholder="Search for location..."
+          onChange={async (e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} onFocus={() => inputRef.current?.select()} />
+
+        {suggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {suggestions.map((place, idx) => <li key={idx} onClick={() => handleSelect(place)}> {place.display_name} </li>)}
+          </ul>
+        )}
+      </div>
+    )}
+  </div>
 }
 
 export default SearchBar;
