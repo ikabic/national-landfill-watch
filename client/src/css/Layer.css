@@ -1,0 +1,75 @@
+.layer, .sub-layer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--brand-secondary);
+}
+
+.layer {
+    padding: 20px;
+}
+
+.sub-layer {
+    padding: 12px 51px 12px 34px;
+}
+
+.layer-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.layer button, .sub-layer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--brand-primary);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.25s ease;
+}
+
+.registry-layer span,
+.detected-layer span {
+    display: flex;
+    border-radius: 50%;
+    font-size: 1em;
+    width: 1em;
+    height: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+.registry-layer span span,
+.detected-layer span span {
+    border-radius: 50%;
+    font-size: 0.7em;
+    width: 0.7em;
+    height: 0.7em;
+}
+
+.registry-layer span {
+    background-color: #193a6299;
+}
+
+.detected-layer span {
+    background-color: #B8320999;
+}
+
+.layer-item {
+  overflow: hidden;
+}
+
+.layer-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.layer-dropdown {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.layer-dropdown.open {
+  max-height: 200px;
+}
