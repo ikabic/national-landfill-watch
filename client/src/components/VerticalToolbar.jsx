@@ -16,7 +16,7 @@ function VerticalToolbar({ activeMarkerRef, landfillProximityRef, setLayersOpen 
         </button>
 
         <div className="toolbar-buttons">
-            <button><FaMap onClick={() => map.flyTo([44.8176, 20.4569], 8, { duration: 1.5 })} /></button>
+            <button onClick={() => map.flyTo([44.8176, 20.4569], 8, { duration: 1.5 })}><FaMap/></button>
             <LocateMeButton activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
             <button onClick={() => setLayersOpen(true)}><FaLayerGroup /></button>
         </div>
