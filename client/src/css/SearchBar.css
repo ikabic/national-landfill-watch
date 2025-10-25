@@ -17,8 +17,16 @@
   width: 100%;
 }
 
-.searchbar.shifted {
-  transform: translateX(-472px);
+@media (min-width: 640px) {
+  .searchbar.shifted {
+    transform: translateX(-472px);
+  }
+}
+
+@media (max-width: 639px) {
+  .searchbar.shifted {
+    transform: translateX(38px);
+  }
 }
 
 .searchbar.collapsed {

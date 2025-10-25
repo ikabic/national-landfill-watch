@@ -6,15 +6,19 @@
     z-index: 1100;
     color: #222;
     display: flex;
+    box-sizing: border-box;
 }
 
 .info-panel-sidebar {
     width: 73px;
     border-right: 1px solid var(--brand-secondary);
+    flex-shrink: 0;
 }
 
 .info-panel-main {
     flex: 1;
+    word-break: break-word;
+    overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -28,6 +32,10 @@
 
     .info-panel.open {
         transform: translateX(0);
+    }
+
+    .info-panel-details {
+        max-height: calc(100vh - 70px);
     }
 }
 
@@ -43,6 +51,18 @@
     .info-panel.open {
         transform: translateY(0);
     }
+
+    .info-panel-details#landfill {
+        max-height: calc(20vh);
+    }
+
+    .info-panel-details#serbia {
+        max-height: calc(50vh);
+    }
+}
+
+.info-panel-details {
+    overflow-y: auto;
 }
 
 .panel-btn:not(.close) svg {
@@ -50,7 +70,10 @@
     width: 16px;
 }
 
-.panel-btn.close, .panel-btn.bbox, .panel-btn.seg, .panel-btn.zoom {
+.panel-btn.close,
+.panel-btn.bbox,
+.panel-btn.seg,
+.panel-btn.zoom {
     left: 20px;
 }
 
@@ -66,11 +89,15 @@
     top: 218px;
 }
 
-.panel-btn.bbox.on, .panel-btn.seg.on, .panel-btn.zoom.on {
+.panel-btn.bbox.on,
+.panel-btn.seg.on,
+.panel-btn.zoom.on {
     background-color: var(--brand-secondary);
 }
 
-.panel-btn.bbox.on:hover, .panel-btn.seg.on:hover, .panel-btn.zoom.on:hover {
+.panel-btn.bbox.on:hover,
+.panel-btn.seg.on:hover,
+.panel-btn.zoom.on:hover {
     background-color: var(--brand-primary);
 }
 
@@ -92,7 +119,10 @@
     margin-block: 0.8em !important;
 }
 
-.info-panel p, .info-panel h2, .info-panel h4, .info-panel span {
+.info-panel p,
+.info-panel h2,
+.info-panel h4,
+.info-panel span {
     transform: scaleY(0.95);
     color: var(--brand-primary);
     margin: 0;
@@ -116,12 +146,13 @@
 }
 
 .info-panel p {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .info-panel span {
-  font-weight: 600;
+    display: flex;
+    font-weight: 600;
+    justify-content: center;
 }
-

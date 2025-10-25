@@ -6,7 +6,7 @@ import { useState } from "react";
 import LandfillImageCanvas from "./LandfillImageCanvas";
 import InfoPanel from "./InfoPanel";
 
-import "../css/LandfillInfoPanel.css"
+import "../css/InfoPanel.css"
 
 function LandfillInfoPanel({ open, onClose, landfill }) {
     const [showBoundingBox, setShowBoundingBox] = useState(false);
@@ -41,7 +41,7 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
     >
         {landfill && <LandfillImageCanvas landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
 
-        <div className="info-panel-details">
+        <div className="info-panel-details" id="landfill">
             <div className="info-panel-details-section">
                 <h2>Landfill #{landfill.id}</h2>
                 <p>{toDMS(landfill.centerLat, true)} {toDMS(landfill.centerLon, false)}</p>
@@ -54,8 +54,8 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
             </div>
 
             <div className="info-panel-details-section">
-                <p>Estimated CH4 emissions<span>{landfill.annualCH4Tonnes} ton/year</span></p>
-                <p>Estimated CH4 emissions (CO2eq)<span>{landfill.annualCO2eTonnes} ton/year</span></p>
+                <p>Estimated CH₄ emissions<span>{landfill.annualCH4Tonnes} ton/year</span></p>
+                <p>Estimated CH₄ emissions (CO₂eq)<span>{landfill.annualCO2eTonnes} ton/year</span></p>
             </div>
         </div>
     </InfoPanel>
