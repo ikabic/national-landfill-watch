@@ -2,7 +2,7 @@ import axios from "axios";
 import L from "leaflet";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { FaBars } from "react-icons/fa";
 
 import MarkerCluster from "./MarkerCluster";
@@ -30,9 +30,11 @@ function LandfillMap() {
   const [layersOpen, setLayersOpen] = useState(false);
   const [showRegistryLayer, setShowRegistryLayer] = useState(false);
   const [showDetectedLayer, setShowDetectedLayer] = useState(true);
+  const [proximityLandfills, setProximityLandfills] = useState([]);
 
   const activeMarkerRef = useRef(null);
   const landfillProximityRef = useRef([]);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     axios.get("/api/landfills/markers")
@@ -68,17 +70,54 @@ function LandfillMap() {
     if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
     landfillProximityRef.current = [];
 
-    if (source == "detected") {
-      const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
-      if (area) landfillProximityRef.current.push(...area);
+    if (source === "detected") {
+    const area = await LandfillProximity(
+      map,
+      landfill.centerLat,
+      landfill.centerLon, 
+      "#b93b37c4"
+    );
+
+    if (area.length > 0) {
+      landfillProximityRef.current.push(...area.map(lf => lf.area));
+    }
+   } 
+  };
+
+ const handleProximityCardClick = async (lf) => {
+    const map = mapRef.current;
+    if (!map) {
+      console.warn("Leaflet map instance not ready yet");
+      return;
+    }
+
+    map.setView([lf.centerLat, lf.centerLon], 16);
+
+    if (lf.id) {
+      await handleMarkerClick(lf.id, map, lf.source || "detected");
+    } else {
+      setSelectedLandfill({ ...lf, id: null, source: "detected" });
+      setPanelOpen({ state: true, type: "Landfill" });
     }
   };
+
+function MapReadyHelper({ onReady }) {
+  const map = useMap();
+  useEffect(() => {
+    if (map) onReady(map);
+  }, [map]);
+  return null;
+}
 
   return <>
     <Logo />
 
-    <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}  whenCreated={(mapInstance) => (window._leaflet_map_instance = mapInstance)}>
+    <MapContainer className="map" center={[44.8176, 20.4569]} zoom={8} minZoom={7} zoomSnap={0} wheelPxPerZoomLevel={100} zoomControl={false} renderer={L.canvas()} preferCanvas={true}  whenCreated={(mapInstance) => (mapRef.current = mapInstance)}>
       <TileLayer className="map-tiles" url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+      <MapReadyHelper onReady={(mapInstance) => {
+          mapRef.current = mapInstance;
+          console.log("✅ Leaflet map ready:", mapInstance);
+      }} />
       <SearchBar panelOpen={panelOpen.state} mapRefs={{ activeMarkerRef, landfillProximityRef }} setPanelOpen={setPanelOpen} />
 
       <div className="map-controls">
@@ -90,7 +129,7 @@ function LandfillMap() {
 
       <MarkerCluster landfills={showDetectedLayer ? landfills : null} registryLandfills={showRegistryLayer ? registryLandfills : null} handleMarkerClick={handleMarkerClick} />
 
-      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} />
+      <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen}  setProximityLandfills={setProximityLandfills} />
 
       {!panelOpen.state && <button className="panel-btn" onClick={() => setPanelOpen({ state: true, type: "Serbia" })}><FaBars /></button>}
 
@@ -101,7 +140,7 @@ function LandfillMap() {
 
     <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
     <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
-    <ProximityInfoPanel open={panelOpen.type === "Proximity" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
+    <ProximityInfoPanel open={panelOpen.state && panelOpen.type === "Proximity"} onClose={() => setPanelOpen({ state: false, type: "" })} landfills={proximityLandfills} onCardClick={handleProximityCardClick}/>
   </>
 }
 

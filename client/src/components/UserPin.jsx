@@ -1,16 +1,16 @@
 import L from "leaflet";
-
 import { useMapEvents } from "react-leaflet";
 import { makePinIcon } from "../utils/makePinIcon";
-
+import { haversineDistance } from "../utils/distance";
 import LandfillProximity from "./LandfillProximity";
 
-function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen }) {
+function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills }) {
   const userIcon = makePinIcon("#b52727ff", "⬤");
 
   const map = useMapEvents({
     click: async (e) => {
       if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn, .searchbar")) return;
+
       if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
 
       landfillProximityRef.current.forEach(c => map.removeLayer(c));
@@ -19,11 +19,28 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen }) {
       const newMarker = L.marker(e.latlng, { icon: userIcon }).addTo(map);
       activeMarkerRef.current = newMarker;
 
-      const areas = await LandfillProximity(map, e.latlng.lat, e.latlng.lng);
-      if (areas) {
-        areas.forEach(area => landfillProximityRef.current.push(area));
-        setPanelOpen({ state: true, type: "Proximity" });
+      const landfills = await LandfillProximity(map, e.latlng.lat, e.latlng.lng);
+
+      if (landfills.length > 0) {
+        landfillProximityRef.current.push(...landfills.map(lf => lf.area));
+        setProximityLandfills(landfills);
+      } else {
+        const res = await fetch("/api/landfills/markers");
+        const allLandfills = await res.json();
+        const nearest = allLandfills
+          .map(lf => ({
+            ...lf,
+            distance: haversineDistance(e.latlng.lat, e.latlng.lng, lf.centerLat, lf.centerLon),
+            id: lf.id,
+            source: "detected"
+          }))
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 3);
+
+        setProximityLandfills(nearest);
       }
+
+      setPanelOpen({ state: true, type: "Proximity" });
     }
   });
 
