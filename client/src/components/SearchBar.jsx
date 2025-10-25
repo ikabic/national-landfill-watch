@@ -16,6 +16,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [selectedPlace, setSelectedPlace] = useState("");
 
   const userIcon = makePinIcon("#b52727ff", "⬤");
   const inputRef = useRef(null);
@@ -29,7 +30,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
   }, [query]);
 
   useEffect(() => {
-    if (debouncedQuery.length < 3) {
+    if (debouncedQuery.length < 3 || debouncedQuery === selectedPlace) {
       setSuggestions([]);
       return;
     }
@@ -47,6 +48,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
   }, [debouncedQuery]);
 
   const handleSelect = async (place) => {
+    setSelectedPlace(place.display_name);
     setQuery(place.display_name);
     setSuggestions([]);
     enableMapInteractions();
@@ -87,7 +89,20 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen }) {
 
         {suggestions.length > 0 && (
           <ul className="suggestions-list">
-            {suggestions.map((place, idx) => <li key={idx} onClick={() => handleSelect(place)}> {place.display_name} </li>)}
+            {suggestions.map((place, idx) => {
+              console.log(place.address)
+              const addr = place.address || {};
+              const village = addr.village || "";
+              const city = addr.town || addr.city || "";
+              const district = addr.state || addr.county || "";
+              const displayText = [village, city, district].filter(Boolean).join(", ");
+
+              return (
+                <li key={idx} onClick={() => handleSelect(place)}>
+                  {displayText || place.display_name}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
