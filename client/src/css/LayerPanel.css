@@ -1,0 +1,122 @@
+.layer-panel {
+    position: fixed;
+    background: #e4e3df;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1100;
+    color: #222;
+    display: flex;
+}
+
+@media (min-width: 640px) {
+    .layer-panel {
+        top: 0;
+        left: 0;
+        width: 420px;
+        height: 100%;
+        transform: translateX(-100%);
+    }
+
+    .layer-panel.open {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 639px) {
+    .layer-panel {
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 60%;
+        transform: translateY(100%);
+    }
+
+    .layer-panel.open {
+        transform: translateY(0);
+    }
+}
+
+.layer-panel-sidebar {
+    width: 73px;
+    border-right: 1px solid var(--brand-secondary);
+}
+
+.layer-panel-main {
+    flex: 1;
+}
+
+.panel-content {
+    padding: 2.5rem 1rem 1rem;
+    overflow-y: auto;
+}
+
+.layer-panel-title {
+    display: flex;
+    gap: 10px;
+    justify-content: end;
+    margin-right: 20px !important;
+    margin-block: 0.8em !important;
+}
+
+.layer-panel p,
+.layer-panel h2 {
+    transform: scaleY(0.95);
+    color: var(--brand-primary);
+    margin: 0;
+}
+
+.layer-panel-content {
+    border-top: 1px solid var(--brand-secondary);
+}
+
+.layer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--brand-secondary);
+    padding: 20px;
+}
+
+.layer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--brand-primary);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.layer-panel p {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.registry-layer span,
+.detected-layer span {
+    display: flex;
+    border-radius: 50%;
+    font-size: 1em;
+    width: 1em;
+    height: 1em;
+    align-items: center;
+    justify-content: center;
+}
+
+.registry-layer span span,
+.detected-layer span span {
+    border-radius: 50%;
+    font-size: 0.7em;
+    width: 0.7em;
+    height: 0.7em;
+}
+
+.registry-layer span {
+    background-color: #193a6299;
+}
+
+.detected-layer span {
+    background-color: #B8320999;
+}

@@ -22,19 +22,21 @@ function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
     const registryClusters = L.markerClusterGroup({ iconCreateFunction: makeClusterIcon("registry") });
     const detectedClusters = L.markerClusterGroup({ iconCreateFunction: makeClusterIcon("detected") });
 
-    landfills.forEach((lf) => {
-      const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
-        .on("click", () => handleMarkerClick(lf.id, map));
+    if (landfills)
+      landfills.forEach((lf) => {
+        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
+          .on("click", () => handleMarkerClick(lf.id, map));
 
-      detectedClusters.addLayer(marker);
-    });
+        detectedClusters.addLayer(marker);
+      });
 
-    registryLandfills.forEach((lf) => {
-      const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
-        .on("click", () => handleMarkerClick(lf.id, map));
+    if (registryLandfills)
+      registryLandfills.forEach((lf) => {
+        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
+          .on("click", () => handleMarkerClick(lf.id, map));
 
-      registryClusters.addLayer(marker);
-    });
+        registryClusters.addLayer(marker);
+      });
 
     map.addLayer(detectedClusters);
     map.addLayer(registryClusters);

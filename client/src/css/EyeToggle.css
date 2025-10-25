@@ -1,0 +1,40 @@
+.eye-toggle {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.eye-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.eye-toggle:hover {
+    color: var(--brand-secondary);
+    transform: scale(1.05);
+}
+
+.eye-toggle:active {
+    color: var(--brand-secondary);
+    transform: scale(0.95);
+}
+
+.icon-wrapper {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.icon-wrapper.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.icon-wrapper.hide {
+    opacity: 0;
+    transform: scale(0.9);
+}

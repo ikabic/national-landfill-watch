@@ -16,6 +16,7 @@ import LandfillProximity from "./LandfillProximity";
 import VerticalToolbar from "./VerticalToolbar";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
+import LayerPanel from "./LayerPanel";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
@@ -26,6 +27,9 @@ function LandfillMap() {
   const [border, setBorder] = useState(null);
   const [selectedLandfill, setSelectedLandfill] = useState(null);
   const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [showRegistryLayer, setShowRegistryLayer] = useState(true);
+  const [showDetectedLayer, setShowDetectedLayer] = useState(true);
 
   const activeMarkerRef = useRef(null);
   const landfillProximityRef = useRef([]);
@@ -73,12 +77,12 @@ function LandfillMap() {
 
       <div className="map-controls">
         <ZoomControls />
-        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
+        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setLayersOpen={setLayersOpen} />
       </div>
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 
-      <MarkerCluster landfills={landfills} registryLandfills={registryLandfills} handleMarkerClick={handleMarkerClick} />
+      <MarkerCluster landfills={showDetectedLayer ? landfills : null} registryLandfills={showRegistryLayer ? registryLandfills : null} handleMarkerClick={handleMarkerClick} />
 
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} />
 
@@ -86,6 +90,8 @@ function LandfillMap() {
 
       <MapLegend />
     </MapContainer>
+
+    <LayerPanel open={layersOpen} onClose={() => setLayersOpen(false)} setShowDetectedLayer={setShowDetectedLayer} showDetectedLayer={showDetectedLayer} setShowRegistryLayer={setShowRegistryLayer} showRegistryLayer={showRegistryLayer} />
 
     <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
     <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />

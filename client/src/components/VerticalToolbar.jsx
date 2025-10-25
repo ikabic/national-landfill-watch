@@ -6,7 +6,7 @@ import LocateMeButton from "./LocateMeButton";
 
 import "../css/VerticalToolbar.css";
 
-function VerticalToolbar({ activeMarkerRef, landfillProximityRef }) {
+function VerticalToolbar({ activeMarkerRef, landfillProximityRef, setLayersOpen }) {
     const [expanded, setExpanded] = useState(true);
     const map = useMap();
 
@@ -18,7 +18,7 @@ function VerticalToolbar({ activeMarkerRef, landfillProximityRef }) {
         <div className="toolbar-buttons">
             <button><FaMap onClick={() => map.flyTo([44.8176, 20.4569], 8, { duration: 1.5 })} /></button>
             <LocateMeButton activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} />
-            <button><FaLayerGroup /></button>
+            <button onClick={() => setLayersOpen(true)}><FaLayerGroup /></button>
         </div>
     </div>
 }
