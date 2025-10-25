@@ -28,7 +28,7 @@ function LandfillMap() {
   const [selectedLandfill, setSelectedLandfill] = useState(null);
   const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
   const [layersOpen, setLayersOpen] = useState(false);
-  const [showRegistryLayer, setShowRegistryLayer] = useState(true);
+  const [showRegistryLayer, setShowRegistryLayer] = useState(false);
   const [showDetectedLayer, setShowDetectedLayer] = useState(true);
 
   const activeMarkerRef = useRef(null);
@@ -54,18 +54,24 @@ function LandfillMap() {
       .catch((err) => console.error(err));
   }, []);
 
-  const handleMarkerClick = async (id, map) => {
+  const handleMarkerClick = async (id, map, source) => {
     let landfill;
-    await axios.get(`/api/landfills/${id}`)
-      .then(res => { landfill = { ...res.data, id: id }; setSelectedLandfill(landfill); })
+    const endpoint =
+      source === "registry"
+        ? `/api/registrylandfills/${id}`
+        : `/api/landfills/${id}`;
+    await axios.get(endpoint)
+      .then(res => { landfill = { ...res.data, id: id, source: source }; setSelectedLandfill(landfill); })
       .then(() => setPanelOpen({ state: true, type: "Landfill" }))
       .catch(err => console.error(err));
 
     if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
     landfillProximityRef.current = [];
 
-    const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
-    if (area) landfillProximityRef.current.push(...area);
+    if (source == "detected") {
+      const area = await LandfillProximity(map, 0, 0, "#b93b37c4", landfill);
+      if (area) landfillProximityRef.current.push(...area);
+    }
   };
 
   return <>

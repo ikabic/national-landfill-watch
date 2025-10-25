@@ -25,7 +25,7 @@ function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
     if (landfills)
       landfills.forEach((lf) => {
         const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
-          .on("click", () => handleMarkerClick(lf.id, map));
+          .on("click", () => handleMarkerClick(lf.id, map, "detected"));
 
         detectedClusters.addLayer(marker);
       });
@@ -33,7 +33,7 @@ function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
     if (registryLandfills)
       registryLandfills.forEach((lf) => {
         const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
-          .on("click", () => handleMarkerClick(lf.id, map));
+          .on("click", () => handleMarkerClick(lf.id, map, "registry"));
 
         registryClusters.addLayer(marker);
       });

@@ -47,11 +47,32 @@ namespace server.controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var landfill = await _context.RegistryLandfills.FindAsync(id);
-            if (landfill == null)
+            var landfillDto = await _context.RegistryLandfills
+                .Where(l => l.Id == id)
+                .Select(l => new RegistryLandfillDto
+                {
+                    ImageName = l.ImageName,
+                    Status = l.Status,
+                    StartYear = l.StartYear,
+                    LifeYears = l.LifeYears,
+                    AreaM2 = l.AreaM2,
+                    VolumeM3 = l.VolumeM3,
+                    TotalMassTon = l.TotalMassTon,
+                    AnnualMswM3 = l.AnnualMswTon,
+                    AnnualCH4Tonnes = l.AnnualCH4Tonnes,
+                    AnnualCO2eTonnes = l.AnnualCO2eTonnes,
+                    CenterLat = l.Lat,
+                    CenterLon = l.Lon,
+                    CenterX = l.CenterXPx,
+                    CenterY = l.CenterYPx,
+                    Radius = l.Radius
+                })
+                .FirstOrDefaultAsync();
+
+            if (landfillDto == null)
                 return NotFound();
 
-            return Ok(landfill);
+            return Ok(landfillDto);
         }
 
         [HttpPost("import")]
