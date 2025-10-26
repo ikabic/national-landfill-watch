@@ -31,7 +31,7 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, s
                 let landfills = await LandfillProximity(map, latitude, longitude);
 
                 if (!landfills || landfills.length === 0) {
-                    const res = await axios.get("/api/landfills/markers");
+                    const res = await axios.get("/api/landfills");
                     const allLandfills = res.data;
 
                     const nearest = allLandfills
