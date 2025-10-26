@@ -128,7 +128,7 @@ useEffect(() => {
 
       <div className="map-controls">
         <ZoomControls />
-        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setLayersOpen={setLayersOpen} />
+        <VerticalToolbar activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setLayersOpen={setLayersOpen}  setPanelOpen={setPanelOpen}  setProximityLandfills={setProximityLandfills} />
       </div>
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}

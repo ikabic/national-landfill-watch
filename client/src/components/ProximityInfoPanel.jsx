@@ -24,6 +24,9 @@ function ProximityInfoPanel({ open, onClose, landfills, onCardClick }) {
         ))
       ) : (
         <>
+          <p className="proximity-message">
+            Your location is not in the immediate vicinity of any mapped landfills.
+          </p>
           <h3>Closest landfills:</h3>
           {nearest.map((lf, i) => (
             <div

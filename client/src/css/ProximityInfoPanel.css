@@ -53,7 +53,7 @@
 .proximity-card {
   background: #fff;
   border-radius: 12px;
-  padding: 12px;
+  padding: 13px;
   margin-bottom: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   cursor: pointer;
@@ -69,5 +69,15 @@
   border-left: 4px solid #dc3545;
   background-color: #fff5f5;
 }
+
+.proximity-message {
+  padding: 10px;
+  font-size: 1.1em;        
+  font-style: italic;     
+  margin-bottom: 8px;     
+  line-height: 1.4;        
+  letter-spacing: 0.5px;   
+}
+
 
 

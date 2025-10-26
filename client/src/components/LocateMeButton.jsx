@@ -1,20 +1,19 @@
+import axios from "axios";
 import L from "leaflet";
+import { haversineDistance } from "../utils/distance";
 
 import { useMap } from "react-leaflet";
 import { FaLocationArrow } from "react-icons/fa";
-import { toast } from "react-toastify";
 import { makePinIcon } from "../utils/makePinIcon";
 
 import LandfillProximity from "./LandfillProximity";
 
-import 'react-toastify/dist/ReactToastify.css';
-
-function LocateMeButton({ activeMarkerRef, landfillProximityRef }) {
+function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills }) {
     const map = useMap();
 
     const handleLocate = () => {
         if (!navigator.geolocation) {
-            toast.error("Geolocation is not supported by your browser.");
+            console.error("Geolocation is not supported by your browser.");
             return;
         }
 
@@ -30,18 +29,36 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef }) {
                 const userIcon = makePinIcon("#b52727ff", "⬤");
                 activeMarkerRef.current = L.marker([latitude, longitude], { icon: userIcon }).addTo(map);
 
-                const areas = await LandfillProximity(map, latitude, longitude);
-                if(areas) areas.forEach(area => landfillProximityRef.current.push(area));
+                let landfills = await LandfillProximity(map, latitude, longitude);
 
-                areas && areas.length > 0 
-                ? toast.warn("Your location is within the influence area of one or more unsanitary landfills.")
-                : toast.info("Your location is not in the immediate vicinity of any mapped landfills.");
+                if (!landfills || landfills.length === 0) {
+                    const res = await axios.get("/api/landfills/markers");
+                    const allLandfills = res.data;
+
+                    const nearest = allLandfills
+                        .map(lf => ({
+                            ...lf,
+                            distance: haversineDistance(latitude, longitude, lf.centerLat, lf.centerLon),
+                            id: lf.id,
+                            source: "detected"
+                        }))
+                        .sort((a, b) => a.distance - b.distance)
+                        .slice(0, 3);
+
+                    setProximityLandfills(nearest);
+                    setPanelOpen({ state: true, type: "Proximity" });
+
+                } else {
+                    setProximityLandfills(landfills);
+                    landfills.forEach(lf => { if (lf.area) landfillProximityRef.current.push(lf.area); });
+                    setPanelOpen({ state: true, type: "Proximity" });
+                }
             },
-            (err) => { toast.error("Unable to retrieve your location: " + err.message); }
+            (err) => { console.error("Unable to retrieve your location: " + err.message); }
         );
     };
 
-    return <button className="locate-btn" onClick={handleLocate}><FaLocationArrow /></button>
+    return <button className="locate-btn" onClick={handleLocate}><FaLocationArrow /></button>;
 }
 
 export default LocateMeButton;
