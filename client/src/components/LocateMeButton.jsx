@@ -1,7 +1,7 @@
 import axios from "axios";
 import L from "leaflet";
 
-import { haversineDistance } from "../utils/havesineDistance";
+import { haversineDistance } from "../utils/haversineDistance";
 import { useMap } from "react-leaflet";
 import { FaLocationArrow } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";

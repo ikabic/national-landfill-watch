@@ -1,7 +1,7 @@
 import axios from "axios";
 import L from "leaflet";
 
-import { haversineDistance } from "../utils/havesineDistance";
+import { haversineDistance } from "../utils/haversineDistance";
 
 export default async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = undefined) {
   if (!map) return [];

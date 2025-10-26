@@ -179,6 +179,7 @@ namespace server.controllers
                         ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography,
                         (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision
                     )
+                     AND TRIM(LOWER(l.status)) <> 'sanitary'
                 ")
                 .ToListAsync();
 
@@ -271,6 +272,7 @@ namespace server.controllers
                    ) AS ""DistanceMeters""
                FROM ""landfills"" AS l
                WHERE l.geom IS NOT NULL
+                  AND TRIM(LOWER(l.status)) <> 'sanitary'
                ORDER BY ""DistanceMeters""
                LIMIT {limit}
            ").ToListAsync();
