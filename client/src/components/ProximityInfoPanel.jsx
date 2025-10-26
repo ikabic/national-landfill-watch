@@ -4,7 +4,10 @@ function ProximityInfoPanel({ open, onClose, landfills, onLandfillClick, setPane
   if (!open) return null;
 
   const inInfluence = landfills?.filter(lf => lf.inInfluence);
-  const nearest = landfills?.sort((a, b) => a.distance - b.distance).slice(0, 3);
+
+  const nearest = landfills?.filter(lf => lf.distance != null).sort((a, b) => a.distance - b.distance)
+  .slice(0, 3);
+
   const formatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
   return <InfoPanel title="Landfill Proximity Overview" open={open} onClose={onClose}>

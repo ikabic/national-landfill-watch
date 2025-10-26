@@ -74,16 +74,17 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
     if (!landfills || landfills.length === 0) {
       const res = await axios.get("/api/landfills/markers");
       const allLandfills = res.data;
+      const filteredLandfills = allLandfills.filter(lf => lf.status !== "Sanitary");
 
-      const nearest = allLandfills
+      const nearest = filteredLandfills
         .map(lf => ({ ...lf, distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon), id: lf.id, source: "detected" }))
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 3);
 
       setProximityLandfills(nearest);
     } else {
-      setProximityLandfills(landfills);
-      landfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
+      setProximityLandfills(filteredLandfills);
+      filteredLandfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
     }
     setPanelOpen({ state: true, type: "Proximity" });
   };

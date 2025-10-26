@@ -31,6 +31,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
         const allLandfills = await res.json();
 
         const nearest = allLandfills
+          .filter(lf => lf.status?.trim().toLowerCase() !== "sanitary")
           .map(lf => ({ ...lf, distance: haversineDistance(e.latlng.lat, e.latlng.lng, lf.centerLat, lf.centerLon), id: lf.id, source: "detected" }))
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 3);
