@@ -1,0 +1,20 @@
+Scripts have already been run and compiled into registry_landfills.csv file that can be found in the dataset folder in root.
+
+If run the scripts will automatically generate the corresponding .csv files based on the .xlsx files which are public registers downloaded from data.gov.rs.
+
+**Before** running ResultsForSanitaryUnsanitary, open the script and adjust the filename to match the specific file for which you want to generate the final .csv file.
+
+Final .csv file: contains all calculated and required data.
+.xlsx files: contain only basic information.
+
+**Execution order**:
+
+run TypeToCSV for all three .xlsx files
+run ResultsForWild
+run ResultsForSanitaryUnsanitary twice, changing the input filenames accordingly
+run CombineAll
+run Formatting
+run AddingTiles
+run DeletingExtensions
+
+The compiled data will be located in the registry_landfills.csv
