@@ -77,7 +77,7 @@ function LandfillMap() {
       .then(res => { landfill = { ...res.data, id: id, source: source }; setSelectedLandfill(landfill); })
       .then(() => {
         setPanelOpen({ state: true, type: "Landfill" });
-        handleOnLocation([landfill.centerLat, landfill.centerLon], 16);
+        handleOnLocation([landfill.centerLat, landfill.centerLon]);
       })
       .catch(err => console.error(err));
 
