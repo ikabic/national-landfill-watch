@@ -1,7 +1,7 @@
 import pandas as pd
 
 input_csv = "final.csv"
-output_csv = "final.csv"
+output_csv = "registryLandfills.csv"
 
 df = pd.read_csv(input_csv)
 

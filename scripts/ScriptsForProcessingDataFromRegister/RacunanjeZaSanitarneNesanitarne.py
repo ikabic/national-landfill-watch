@@ -2,30 +2,66 @@ import pandas as pd
 import math
 from datetime import datetime
 
-AVERAGE_HEIGHT_M = 1
-MSW_DENSITY_TON_PER_M3 = 0.4
+MSW_DENSITY_TON_PER_M3 = 0.7
 START_YEAR_DEFAULT = 2005
-K = 0.05
-MCF = 0.5
-DOC = 0.15
-F = 0.5
-CO2_EQ = 25
-
 current_year = datetime.now().year
+K = 0.1
+MCF = 0.6
+DOC = 0.218
+DOCF = 0.5
+F = 0.5
+CO2_EQ = 28
 
-def calc_fod_emission(amsw, k, years, mcf, doc, f, co2_eq):
+def estimate_area(volume_m3, min_height=0.7, max_height=12.0, min_area=500, max_area=63000):
+
+    k = (max_height - min_height) / (max_area - min_area)
+    a_coef = k
+    b_coef = min_height - k * min_area
+    c_coef = -volume_m3
+    
+    discriminant = b_coef**2 - 4 * a_coef * c_coef
+    
+    if discriminant >= 0:
+    
+        area_1 = (-b_coef + discriminant**0.5) / (2 * a_coef)
+        area_2 = (-b_coef - discriminant**0.5) / (2 * a_coef)
+        area_m2 = area_1 if area_1 > 0 else area_2
+        
+        
+        if min_area <= area_m2 <= max_area:
+            return area_m2
+    
+    area_if_max_height = volume_m3 / max_height
+    if area_if_max_height >= max_area:
+        return area_if_max_height
+    
+    
+    area_if_min_height = volume_m3 / min_height
+    if area_if_min_height <= min_area:
+        return area_if_min_height
+    
+    
+    return volume_m3 / min_height
+
+def calc_fod_emission(msw_per_year, k, years, mcf, doc, f, co2_eq):
     ch4_total = 0
-    for t in range(years):
-        ch4_t = amsw * (1 - math.exp(-k)) * (1 - math.exp(-k * t)) * mcf * doc * f
+    L0 = DOC * DOCF * F * (16.0 / 12.0)
+
+    for t in range(1, years + 1):
+        ch4_t = 0
+        for x in range(1, t + 1):
+            ch4_t += msw_per_year * L0 * k * math.exp(-k * (t - x)) * mcf
         ch4_total += ch4_t
+
     co2e_total = ch4_total * co2_eq
     annual_ch4 = ch4_total / years
     annual_co2e = co2e_total / years
+
     return round(annual_ch4, 2), round(annual_co2e, 2)
 
 #OVDE UNOS FAJLA NA KOM SE RADI
-input_file = "sanitarne_deponije.csv"
-output_file = "sanitarne_deponije_final.csv"
+input_file = "nesanitarne_deponije.csv"
+output_file = "nesanitarne_deponije_final.csv"
 df = pd.read_csv(input_file)
 
 results = []
@@ -40,7 +76,7 @@ for idx, row in df.iterrows():
     life_years = max(life_years, 1)
     volume_m3 = total_mass_ton / MSW_DENSITY_TON_PER_M3
 
-    area_m2 = volume_m3 / AVERAGE_HEIGHT_M
+    area_m2 = estimate_area(volume_m3)
 
     amswx = total_mass_ton / life_years
 
