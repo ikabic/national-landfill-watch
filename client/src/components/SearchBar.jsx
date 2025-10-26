@@ -72,7 +72,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
     onLocation([lat, lon], 16);
     const landfills = await LandfillProximity(map, lat, lon);
     if (!landfills || landfills.length === 0) {
-      const res = await axios.get("/api/landfills/markers");
+      const res = await axios.get("/api/landfills");
       const allLandfills = res.data;
       const filteredLandfills = allLandfills.filter(lf => lf.status !== "Sanitary");
 
