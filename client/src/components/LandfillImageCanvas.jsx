@@ -97,7 +97,7 @@ function LandfillImageCanvas({ landfill, showBoundingBox = true, showBoundingPol
         if (enableZoom) cleanup = setupCanvasZoom(canvas, ctx, drawBaseImage);
       };
     })
-    .catch(err => {
+    .catch(() => {
       const containerWidth = canvas.parentElement.clientWidth;
       const containerHeight = 200; 
       canvas.width = containerWidth;
@@ -105,10 +105,10 @@ function LandfillImageCanvas({ landfill, showBoundingBox = true, showBoundingPol
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = "16px sans-serif";
-      ctx.fillStyle = "red";
+      ctx.fillStyle = "#b52727ff";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Slika ne postoji", canvas.width / 2, canvas.height / 2);
+      ctx.fillText("Image unavailable", canvas.width / 2, canvas.height / 2);
     });
 
     return () => { if (cleanup) cleanup(); };

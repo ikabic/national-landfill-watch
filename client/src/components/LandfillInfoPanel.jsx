@@ -32,14 +32,14 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
                     </>
                 )}
 
-                <button className={`panel-btn zoom ${enableZoom ? "on" : ""}`}
+                <button className={`panel-btn zoom ${enableZoom ? "on" : ""} ${landfill.source !== "detected" ? "registry" : ""}`}
                     title="Enable zoom" onClick={() => setEnableZoom(!enableZoom)}>
                     <LuFocus />
                 </button>
             </>
         }
     >
-        {landfill && <LandfillImageCanvas landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
+        {landfill && <LandfillImageCanvas className="info-panel-image" landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
 
         <div className="info-panel-details" id="landfill">
             <div className="info-panel-details-section">

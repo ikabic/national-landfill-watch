@@ -93,6 +93,10 @@
     top: 218px;
 }
 
+.panel-btn.zoom.registry {
+    top: 158px;
+}
+
 .panel-btn.bbox.on,
 .panel-btn.seg.on,
 .panel-btn.zoom.on {
@@ -146,7 +150,7 @@
     border-top: 1px solid var(--brand-secondary);
 }
 
-.info-panel-details-section:not(:last-child) {
+.info-panel-details-section:not(:last-child), .info-panel-image {
     border-bottom: 1px solid var(--brand-secondary);
 }
 
