@@ -14,8 +14,8 @@ function LayerPanel({ open, onClose, showRegistryLayer, setShowRegistryLayer, sh
             <div className="layer-panel-main">
                 <h2 className="layer-panel-title"> Marker Layers </h2>
                 <div className="layer-panel-content">
-                    <Layer name="Study-Based Registry Landfills" className="registry-layer" show={showRegistryLayer} setShow={setShowRegistryLayer} />
                     <Layer name="Model Detected Landfills" className="detected-layer" show={showDetectedLayer} setShow={setShowDetectedLayer} />
+                    <Layer name="Study-Based Registry Landfills" className="registry-layer" show={showRegistryLayer} setShow={setShowRegistryLayer} />
                 </div>
             </div>
         </div>
