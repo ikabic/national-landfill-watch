@@ -31,9 +31,9 @@
 ## Table of Contents
 - [Features](#features)
 - [Model Training](#model-training)
-  * [Dataset](#dataset)
-  * [Detection](#detection)
-  * [Segmentation](#segmentation)
+  * [Dataset](#-dataset)
+  * [Detection](#-detection)
+  * [Segmentation](#-segmentation)
 - [Tech Stack](#tech-stack)
 - [Folder Structure](#folder-structure)
 - [Installation](#installation)
