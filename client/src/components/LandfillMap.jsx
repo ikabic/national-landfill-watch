@@ -2,7 +2,7 @@ import axios from "axios";
 import L from "leaflet";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { FaBars } from "react-icons/fa";
 
 import MarkerCluster from "./MarkerCluster";
