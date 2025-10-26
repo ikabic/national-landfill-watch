@@ -1,0 +1,225 @@
+# Skripta za transformisanje YOLO izlaza testa u csv fajl sa podacima za bazu
+
+import os
+import glob
+import csv
+import json
+from datetime import datetime
+from pyproj import Transformer
+from shapely.geometry import Polygon, Point, mapping, shape
+import math
+
+labels_folder = "test/full_labels"
+segmentation_folder = "seg2"
+output_csv = "test/data/full_dataset2.csv"
+
+# --- UTM <-> WGS84 ---
+transformer_to_wgs = Transformer.from_crs("EPSG:32634", "EPSG:4326", always_xy=True)
+
+# --- Tile parametri ---
+tile_size = 256
+tiles_per_block = 2
+block_size = tile_size * tiles_per_block  # 512 px blok (1 px = 1 m)
+xmin, ymax = 331367, 5117462  # NW corner
+
+# --- Konstantne vrednosti ---
+MSW_DENSITY_TON_PER_M3 = 0.7
+START_YEAR = 2005
+current_year = datetime.now().year
+K = 0.1
+MCF = 0.6
+DOC = 0.218
+DOCF = 0.5
+F = 0.5
+CO2_EQ = 28
+
+# --- YOLO -> UTM ---
+def yolo_to_utm(row, col, x_center_norm, y_center_norm, w_norm, h_norm):
+    block_x0 = xmin + col * block_size
+    block_y0 = ymax - row * block_size
+    x_center = block_x0 + x_center_norm * block_size
+    y_center = block_y0 - y_center_norm * block_size
+    width_m = w_norm * block_size
+    height_m = h_norm * block_size
+    return x_center, y_center, width_m, height_m
+
+# --- UTM -> lat/lon ---
+def utm_to_latlon(utm_x, utm_y):
+    lon, lat = transformer_to_wgs.transform(utm_x, utm_y)
+    return lat, lon
+
+def estimate_volume(area_m2, min_height=0.7, max_height=12.0, min_area=500, max_area=63000):
+
+    clamped_area = max(min(area_m2, max_area), min_area)
+
+    height = min_height + (clamped_area - min_area) / (max_area - min_area) * (max_height - min_height)
+
+    volume_m3 = area_m2 * height
+    return volume_m3
+
+def calc_fod_emission(msw_per_year, k, years, mcf, doc, f, co2_eq):
+    ch4_total = 0
+    L0 = DOC * DOCF * F * (16.0 / 12.0)
+
+    for t in range(1, years + 1):
+        ch4_t = 0
+        for x in range(1, t + 1):
+            ch4_t += msw_per_year * L0 * k * math.exp(-k * (t - x)) * mcf
+        ch4_total += ch4_t
+
+    co2e_total = ch4_total * co2_eq
+    annual_ch4 = ch4_total / years
+    annual_co2e = co2e_total / years
+
+    return round(annual_ch4, 2), round(annual_co2e, 2)
+
+
+# --- Glavni loop ---
+all_rows = []
+label_files = glob.glob(os.path.join(labels_folder, "*.txt"))
+print(f"🔹 Pronađeno label fajlova: {len(label_files)}")
+
+for label_file in label_files:
+    basename = os.path.splitext(os.path.basename(label_file))[0]
+    parts = basename.split("_")
+    if len(parts) < 4:
+        print(f"⚠️ Preskačem fajl sa nepoznatim formatom: {label_file}")
+        continue
+    _, _, row_str, col_str = parts
+    row = int(row_str)
+    col = int(col_str)
+
+    with open(label_file, "r") as f:
+        lines = f.readlines()
+
+    for line in lines:
+        if line.strip() == "":
+            continue
+
+        parts = list(map(float, line.strip().split()))
+        if len(parts) < 6:  # očekujemo i confidence
+            continue
+        class_id, xc, yc, w, h, conf = parts
+
+        if conf < 0.67: 
+            continue
+
+        # --- YOLO u piksele ---
+        center_x_px = xc * block_size
+        center_y_px = yc * block_size
+        width_px = w * block_size
+        height_px = h * block_size
+
+        # Bounding box (ostaje za GeoJSON)
+        x_min_px = center_x_px - width_px / 2
+        y_min_px = center_y_px - height_px / 2
+        x_max_px = center_x_px + width_px / 2
+        y_max_px = center_y_px + height_px / 2
+
+        polygon_coords = [
+            (x_min_px, y_min_px),
+            (x_min_px, y_max_px),
+            (x_max_px, y_max_px),
+            (x_max_px, y_min_px),
+            (x_min_px, y_min_px)
+        ]
+        polygon = Polygon(polygon_coords)
+        bbox_geojson = mapping(polygon)
+
+        # --- Centar u UTM -> lat/lon ---
+        utm_x, utm_y, _, _ = yolo_to_utm(row, col, xc, yc, w, h)
+        center_lat, center_lon = utm_to_latlon(utm_x, utm_y)
+
+        # --- Segmentacija ---
+        seg_path = os.path.join(segmentation_folder, f"{basename}.geojson")
+        if os.path.exists(seg_path):
+            with open(seg_path, "r") as sf:
+                seg_data = json.load(sf)
+                geometries = [shape(f["geometry"]) for f in seg_data["features"]]
+                area_m2 = sum(geom.area for geom in geometries)  # ukupna površina svih poligona
+                # bounds za prikaz ili druge potrebe: možeš uzeti minimalni bounding box
+                minx = min(geom.bounds[0] for geom in geometries)
+                miny = min(geom.bounds[1] for geom in geometries)
+                maxx = max(geom.bounds[2] for geom in geometries)
+                maxy = max(geom.bounds[3] for geom in geometries)
+                width_px = maxx - minx
+                height_px = maxy - miny
+                segmentation_str = json.dumps(seg_data)
+        else:
+            area_m2 = width_px * height_px
+            segmentation_str = 'null'
+
+        # --- Zapremina i masa ---
+        volume_m3 = estimate_volume(area_m2)
+        total_mass_ton = volume_m3 * MSW_DENSITY_TON_PER_M3
+
+        def map_methane_to_radius(ch4_tons_per_year, a=None, b=None):
+            if a is None:
+                a = 90.9
+            if b is None:
+                b = 72.7
+
+            R = a * math.sqrt(ch4_tons_per_year) + b
+
+            R = max(50, R)
+            return R
+
+        # --- FOD emisija ---
+        life_years = current_year - START_YEAR
+        amswx = total_mass_ton / life_years
+        annual_ch4, annual_co2e = calc_fod_emission(amswx, K, life_years, MCF, DOC, F, CO2_EQ)
+
+        influence_radius = map_methane_to_radius(annual_ch4)
+
+        # --- GeoJSON circle ---
+        circle = Point(center_x_px, center_y_px).buffer(influence_radius)
+        circle_geojson = mapping(circle)
+        geojson_dict = {
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "geometry": bbox_geojson, "properties": {"type": "bbox"}},
+                {"type": "Feature", "geometry": circle_geojson, "properties": {"type": "influence", "influence_radius": influence_radius}}
+            ]
+        }
+        geojson_str = json.dumps(geojson_dict)
+
+        landfill = {
+            "image_name": basename,
+            "status": "Unsanitary",
+            "start_year": START_YEAR,
+            "life_years": life_years,
+            "area_m2": round(area_m2, 2),
+            "volume_m3": round(volume_m3, 2),
+            "total_mass_ton": round(total_mass_ton, 2),
+            "annual_msw_m3": round(amswx, 2),
+            "annual_ch4_tonnes": annual_ch4,
+            "annual_co2e_tonnes": annual_co2e,
+            "geojson": geojson_str,
+            "segmentation": segmentation_str,
+            "center_lat": center_lat,
+            "center_lon": center_lon,
+            "geom": f"POINT({center_lon} {center_lat})",
+            "influence_radius": influence_radius,
+            "center_x_px": center_x_px,
+            "center_y_px": center_y_px,
+            "width_px": width_px,
+            "height_px": height_px
+        }
+
+        all_rows.append(landfill)
+
+
+# --- Snimanje u CSV ---
+os.makedirs(os.path.dirname(output_csv), exist_ok=True)
+with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=[
+        "image_name","status","start_year","life_years",
+        "area_m2","volume_m3","total_mass_ton",
+        "annual_msw_m3","annual_ch4_tonnes","annual_co2e_tonnes",
+        "geojson","segmentation","center_lat","center_lon","geom","influence_radius",
+        "center_x_px","center_y_px","width_px","height_px"
+    ], quoting=csv.QUOTE_ALL)
+    writer.writeheader()
+    writer.writerows(all_rows)
+
+print(f"✅ Gotovo! Snimljeno {len(all_rows)} deponija u {output_csv}")
