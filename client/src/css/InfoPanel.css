@@ -59,6 +59,10 @@
     .info-panel-details#serbia {
         max-height: calc(50vh);
     }
+
+    .info-panel-details#info {
+        max-height: calc(35vh);
+    }
 }
 
 .info-panel-details {
@@ -120,6 +124,7 @@
 }
 
 .info-panel p,
+.info-panel a,
 .info-panel h2,
 .info-panel h4,
 .info-panel span {
@@ -164,4 +169,23 @@
 
 .info-panel-listitem {
     margin: 16px 0;
+}
+
+.info-links {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.info-panel a {
+    color: #1c4479;
+}
+
+.info-panel a:hover {
+    color: #320d68;
+}
+
+.info-links .link-icon {
+    vertical-align: top;
+    margin-top: 3px;
 }

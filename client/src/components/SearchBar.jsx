@@ -3,7 +3,7 @@ import L from "leaflet";
 
 import { haversineDistance } from "../utils/havesineDistance";
 import { useState, useRef, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaInfo } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
 import { handleMapInteractions } from "../utils/handleMapInteractions";
 
@@ -92,33 +92,37 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
     }
   };
 
-  return <div className={`searchbar ${panelOpen.state ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
-    <button onClick={() => setExpanded(!expanded)}> <FaSearch /> </button>
+  return <div className={`actions ${panelOpen.state ? "shifted" : ""}`}>
+    <button className="info-btn" onClick={() => setPanelOpen({ state: true, type: "Info" })}><FaInfo /></button>
 
-    {expanded && (
-      <div className="search-input-wrapper">
-        <input ref={inputRef} type="text" value={query} title={query} placeholder="Search for location..."
-          onChange={async (e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} onFocus={() => inputRef.current?.select()} />
+    <div className={`searchbar ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
+      <button onClick={() => setExpanded(!expanded)}><FaSearch /></button>
 
-        {suggestions.length > 0 && (
-          <ul className="suggestions-list">
-            {suggestions.map((place, idx) => {
-              const addr = place.address || {};
-              const village = addr.village || "";
-              const city = addr.town || addr.city || "";
-              const district = addr.state || addr.county || "";
-              const displayText = [village, city, district].filter(Boolean).join(", ");
+      {expanded && (
+        <div className="search-input-wrapper">
+          <input ref={inputRef} type="text" value={query} title={query} placeholder="Search for location..."
+            onChange={async (e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} onFocus={() => inputRef.current?.select()} />
 
-              return (
-                <li key={idx} onClick={() => handleSelect(place)}>
-                  {displayText || place.display_name}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
-    )}
+          {suggestions.length > 0 && (
+            <ul className="suggestions-list">
+              {suggestions.map((place, idx) => {
+                const addr = place.address || {};
+                const village = addr.village || "";
+                const city = addr.town || addr.city || "";
+                const district = addr.state || addr.county || "";
+                const displayText = [village, city, district].filter(Boolean).join(", ");
+
+                return (
+                  <li key={idx} onClick={() => handleSelect(place)}>
+                    {displayText || place.display_name}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
   </div>
 }
 

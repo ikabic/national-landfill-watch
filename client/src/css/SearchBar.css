@@ -1,8 +1,4 @@
 .searchbar {
-  position: absolute;
-  top: 20px;
-  right: 60px;
-  z-index: 1000;
   display: flex;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -18,13 +14,13 @@
 }
 
 @media (min-width: 640px) {
-  .searchbar.shifted {
+  .actions.shifted {
     transform: translateX(-472px);
   }
 }
 
 @media (max-width: 639px) {
-  .searchbar.shifted {
+  .actions.shifted {
     transform: translateX(38px);
   }
 }
@@ -35,6 +31,16 @@
 
 .searchbar.expanded {
   width: 240px;
+}
+
+.actions {
+  position: absolute;
+  top: 20px;
+  right: 60px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  transition: width 0.3s ease, transform 0.3s ease-in-out;
 }
 
 .searchbar button {
