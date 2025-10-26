@@ -1,7 +1,7 @@
 import axios from "axios";
 import L from "leaflet";
-import { haversineDistance } from "../utils/distance";
 
+import { haversineDistance } from "../utils/havesineDistance";
 import { useState, useRef, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
@@ -11,7 +11,7 @@ import LandfillProximity from "./LandfillProximity";
 
 import "../css/SearchBar.css";
 
-function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) {
+function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, onLocation }) {
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -52,7 +52,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) 
     setQuery(place.display_name);
     setSuggestions([]);
     enableMapInteractions();
-    
+
     const map = mapRefs.map.current;
     if (!map) return;
 
@@ -66,32 +66,23 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) 
     const newMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
     mapRefs.activeMarkerRef.current = newMarker;
 
-    map.setView([lat, lon], 16);
+    onLocation([lat, lon], 16);
     const landfills = await LandfillProximity(map, lat, lon);
     if (!landfills || landfills.length === 0) {
       const res = await axios.get("/api/landfills/markers");
       const allLandfills = res.data;
 
       const nearest = allLandfills
-        .map(lf => ({
-          ...lf,
-          distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon),
-          id: lf.id,
-          source: "detected"
-        }))
+        .map(lf => ({ ...lf, distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon), id: lf.id, source: "detected" }))
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 3);
 
       setProximityLandfills(nearest);
-
-      setPanelOpen({ state: true, type: "Proximity" });
     } else {
-
       setProximityLandfills(landfills);
       landfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
-      setPanelOpen({ state: true, type: "Proximity" });
     }
-
+    setPanelOpen({ state: true, type: "Proximity" });
   };
 
   const handleKeyDown = (e) => {

@@ -1,15 +1,14 @@
 import axios from "axios";
 import L from "leaflet";
 
-import { haversineDistance } from "../utils/distance";
+import { haversineDistance } from "../utils/havesineDistance";
 import { useMap } from "react-leaflet";
 import { FaLocationArrow } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
-import { shiftMapCenter } from "../utils/shiftMapCenter";
 
 import LandfillProximity from "./LandfillProximity";
 
-function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, layersOpen }) {
+function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, onLocation }) {
     const map = useMap();
 
     const handleLocate = () => {
@@ -21,7 +20,6 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, s
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
                 const { latitude, longitude } = pos.coords;
-                shiftMapCenter(map, true, layersOpen, [latitude, longitude], 16);
 
                 if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
                 landfillProximityRef.current.forEach(c => map.removeLayer(c));
@@ -42,13 +40,12 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, s
                         .slice(0, 3);
 
                     setProximityLandfills(nearest);
-                    setPanelOpen({ state: true, type: "Proximity" });
-
                 } else {
                     setProximityLandfills(landfills);
-                    landfills.forEach(lf => { if (lf.area) landfillProximityRef.current.push(lf.area); });
-                    setPanelOpen({ state: true, type: "Proximity" });
+                    landfills.forEach(lf => { if (lf.area) landfillProximityRef.current.push(lf.area); });   
                 }
+                setPanelOpen({ state: true, type: "Proximity" });
+                onLocation([latitude, longitude], 16);
             },
             (err) => { console.error("Unable to retrieve your location: " + err.message); }
         );

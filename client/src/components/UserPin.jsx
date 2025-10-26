@@ -2,12 +2,11 @@ import L from "leaflet";
 
 import { useMapEvents } from "react-leaflet";
 import { makePinIcon } from "../utils/makePinIcon";
-import { haversineDistance } from "../utils/distance";
-import { shiftMapCenter } from "../utils/shiftMapCenter";
+import { haversineDistance } from "../utils/havesineDistance";
 
 import LandfillProximity from "./LandfillProximity";
 
-function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, layersOpen }) {
+function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, onLocation }) {
   const userIcon = makePinIcon("#b52727ff", "⬤");
 
   const map = useMapEvents({
@@ -39,7 +38,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
         setProximityLandfills(nearest);
       }
       setPanelOpen({ state: true, type: "Proximity" });
-      shiftMapCenter(map, true, layersOpen, [e.latlng.lat, e.latlng.lng]);
+      onLocation([e.latlng.lat, e.latlng.lng]);
     }
   });
 

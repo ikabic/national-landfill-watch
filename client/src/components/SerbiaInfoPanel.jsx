@@ -7,7 +7,7 @@ import InfoPanel from "./InfoPanel";
 
 import "../css/InfoPanel.css"
 
-function SerbiaInfoPanel({ open, onClose }) {
+function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -122,7 +122,7 @@ function SerbiaInfoPanel({ open, onClose }) {
             {topLandfills.length > 0 && <div className="info-panel-details-section">
                 <span>Top 3 Largest Landfills by Area</span>
                 {topLandfills.map(lf => <div key={lf.id} className="info-panel-listitem">
-                    <span className="route">{lf.status} Landfill ID {lf.id}</span>
+                    <span className="route" onClick={() => onLandfillClick(lf.id)}>{lf.status} Landfill ID {lf.id}</span>
                     <p style={{ justifyContent: "center" }}><small>
                         Area: {lf.areaM2?.toFixed(2)} m²&nbsp;&nbsp;•&nbsp;&nbsp;
                         Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;&nbsp;

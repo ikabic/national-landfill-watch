@@ -2,7 +2,7 @@ import InfoPanel from "./InfoPanel";
 
 import "../css/ProximityInfoPanel.css";
 
-function ProximityInfoPanel({ open, onClose, landfills, onCardClick }) {
+function ProximityInfoPanel({ open, onClose, landfills, onLandfillClick }) {
   if (!open) return null;
 
   const inInfluence = landfills?.filter(lf => lf.inInfluence);
@@ -12,7 +12,7 @@ function ProximityInfoPanel({ open, onClose, landfills, onCardClick }) {
     <InfoPanel title="Landfill Proximity Overview" open={open} onClose={onClose}>
       {inInfluence?.length > 0 ? (
         inInfluence.map((lf, i) => (
-          <div key={i} className="proximity-card warning" onClick={() => onCardClick(lf)}>
+          <div key={i} className="proximity-card warning" onClick={() => onLandfillClick(lf.id)}>
             <strong>WARNING:</strong> Your location is within influence zone of a landfill with status {lf.status || "unknown"}.
           </div>
         ))
@@ -23,7 +23,7 @@ function ProximityInfoPanel({ open, onClose, landfills, onCardClick }) {
           </p>
           <h3>Closest landfills:</h3>
           {nearest.map((lf, i) => (
-            <div key={i} className="proximity-card" onClick={() => onCardClick(lf)}>
+            <div key={i} className="proximity-card" onClick={() => onLandfillClick(lf.id)}>
                {lf.status || "unknown"} ({lf.distance.toFixed(2)} km)
             </div>
           ))}
