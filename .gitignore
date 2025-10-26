@@ -63,5 +63,5 @@ yarn-error.log*
 *.tmp
 *.temp
 
-server/static/images/landfills/
+server/static/images/landfills/*.jpg
 server/appsettings.json
