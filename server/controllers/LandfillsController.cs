@@ -169,7 +169,10 @@ namespace server.controllers
                         l.start_year AS ""StartYear"",
                         (l.geojson->'features'->1->'properties'->>'influence_radius')::double precision AS ""InfluenceRadius"",
                         l.center_lat AS ""CenterLat"",
-                        l.center_lon AS ""CenterLon""
+                        l.center_lon AS ""CenterLon"",
+                        l.area_m2 AS ""AreaM2"",
+                        l.total_mass_ton AS ""TotalMassTon"",
+                        l.annual_ch4_tonnes as ""AnnualCH4Tonnes""
                     FROM ""landfills"" AS l
                     WHERE ST_DWithin(
                         geom,
@@ -259,6 +262,9 @@ namespace server.controllers
                    l.status AS ""Status"",
                    l.center_lat AS ""CenterLat"",
                    l.center_lon AS ""CenterLon"",
+                   l.area_m2 AS ""AreaM2"",
+                   l.total_mass_ton AS ""TotalMassTon"",
+                   l.annual_ch4_tonnes as ""AnnualCH4Tonnes"",
                    ST_Distance(
                        l.geom,
                        ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography

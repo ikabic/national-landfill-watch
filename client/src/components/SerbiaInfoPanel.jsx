@@ -123,10 +123,11 @@ function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
                 <span>Top 3 Largest Landfills by Area</span>
                 {topLandfills.map(lf => <div key={lf.id} className="info-panel-listitem">
                     <span className="route" onClick={() => onLandfillClick(lf.id)}>{lf.status} Landfill ID {lf.id}</span>
-                    <p style={{ justifyContent: "center" }}><small>
-                        Area: {lf.areaM2?.toFixed(2)} m²&nbsp;&nbsp;•&nbsp;&nbsp;
-                        Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;&nbsp;
-                        CH₄: {lf.annualCH4Tonnes?.toFixed(2)} ton
+                    <p style={{ textAlign: "center", justifyContent: "center" }}><small>
+                        Area: {lf.areaM2?.toFixed(2)} m²
+                        <br />
+                        Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;
+                        CH₄: {lf.annualCH4Tonnes?.toFixed(2)} ton/year
                     </small></p>
                 </div>
                 )}

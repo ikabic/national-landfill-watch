@@ -27,7 +27,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
         landfillProximityRef.current.push(...landfills.map(lf => lf.area));
         setProximityLandfills(landfills);
       } else {
-        const res = await fetch("/api/landfills/markers");
+        const res = await fetch("/api/landfills");
         const allLandfills = await res.json();
 
         const nearest = allLandfills

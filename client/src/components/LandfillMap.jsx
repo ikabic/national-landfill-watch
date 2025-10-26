@@ -117,7 +117,7 @@ function LandfillMap() {
 
     <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
     <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} />
-    <ProximityInfoPanel open={panelOpen.state && panelOpen.type === "Proximity"} onClose={() => setPanelOpen({ state: false, type: "" })} landfills={proximityLandfills} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} />
+    <ProximityInfoPanel open={panelOpen.state && panelOpen.type === "Proximity"} onClose={() => setPanelOpen({ state: false, type: "" })} landfills={proximityLandfills} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} setPanelOpen={setPanelOpen} />
   </>
 }
 
