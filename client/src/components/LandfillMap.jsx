@@ -77,14 +77,14 @@ function LandfillMap() {
       .then(res => { landfill = { ...res.data, id: id, source: source }; setSelectedLandfill(landfill); })
       .then(() => {
         setPanelOpen({ state: true, type: "Landfill" });
-        handleOnLocation([landfill.centerLat, landfill.centerLon], 16);
+        handleOnLocation([landfill.centerLat, landfill.centerLon], 14);
       })
       .catch(err => console.error(err));
 
     if (landfillProximityRef.current) landfillProximityRef.current.forEach(c => map.removeLayer(c));
     landfillProximityRef.current = [];
 
-    if (source === "detected") {
+    if (source === "detected" && landfill.status != "Sanitary") {
       const area = await LandfillProximity(map, landfill.centerLat, landfill.centerLon, "#b93b37c4");
       if (area.length > 0) landfillProximityRef.current.push(...area.map(lf => lf.area));
     }
