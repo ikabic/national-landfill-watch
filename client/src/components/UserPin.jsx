@@ -2,7 +2,7 @@ import L from "leaflet";
 
 import { useMapEvents } from "react-leaflet";
 import { makePinIcon } from "../utils/makePinIcon";
-import { haversineDistance } from "../utils/havesineDistance";
+import { haversineDistance } from "../utils/haversineDistance";
 
 import LandfillProximity from "./LandfillProximity";
 
