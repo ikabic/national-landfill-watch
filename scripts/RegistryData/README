@@ -1,0 +1,20 @@
+NO NEED TO RUN SCRIPTS AT THE MOMENT—ALL THREE FILES HAVE ALREADY BEEN COMBINED INTO final.csv.
+The individual files also exist separately and they have .xlsx extensions.
+
+All scripts simply need to be executed from this folder. Based on the .xlsx files (which are public registers downloaded from data.gov.rs), they will automatically generate the corresponding .csv files.
+
+BEFORE running ResultsForSanitaryUnsanitary, open the script and adjust the filename to match the specific file for which you want to generate the final CSV.
+
+Final CSV: contain all calculated and required data.
+xlsx files: contain only basic information.
+EXECUTION ORDER:
+
+Run TypeToCSV for all three files.
+Run ResultsForWild
+Run ResultsForSanitaryUnsanitary twice, changing the input filenames accordingly.
+Run CombineAll.
+Run Formatting.
+Run AddingTiles.
+Run DeletingExtensions.
+
+All finished data is located in the registryLandfills.csv
