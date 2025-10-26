@@ -189,7 +189,7 @@ namespace server.controllers
         public async Task<IActionResult> GetNationalStatistics()
         {
             var stats = await _context.Landfills
-                .Where(l => l.AreaM2.HasValue && l.TotalMassTon.HasValue)
+                .Where(l => l.AreaM2.HasValue && l.TotalMassTon.HasValue && l.Status == "Unsanitary")
                 .GroupBy(_ => 1)
                 .Select(g => new
                 {
@@ -209,7 +209,7 @@ namespace server.controllers
                 return NotFound(new { message = "No landfill data found" });
 
             var topLandfills = await _context.Landfills
-                .Where(l => l.AreaM2.HasValue)
+                .Where(l => l.AreaM2.HasValue && l.Status == "Unsanitary")
                 .OrderByDescending(l => l.AreaM2)
                 .Take(3)
                 .Select(l => new
