@@ -1,6 +1,6 @@
 import { FaArrowLeft } from "react-icons/fa";
 
-import EyeToggle from "./EyeToggle";
+import Layer from "./Layer";
 
 import "../css/LayerPanel.css";
 
@@ -14,23 +14,8 @@ function LayerPanel({ open, onClose, showRegistryLayer, setShowRegistryLayer, sh
             <div className="layer-panel-main">
                 <h2 className="layer-panel-title"> Marker Layers </h2>
                 <div className="layer-panel-content">
-                    <div className="layer">
-                        <p className="registry-layer">
-                            <span>  <span /> </span>
-                            Study-Based Registry Landfills
-                        </p>
-
-                        <EyeToggle setVisible={setShowRegistryLayer} visible={showRegistryLayer} />
-                    </div>
-
-                    <div className="layer">
-                        <p className="detected-layer">
-                            <span>  <span /> </span>
-                            Model Detected Landfills
-                        </p>
-
-                        <EyeToggle setVisible={setShowDetectedLayer} visible={showDetectedLayer} />
-                    </div>
+                    <Layer name="Study-Based Registry Landfills" className="registry-layer" show={showRegistryLayer} setShow={setShowRegistryLayer} />
+                    <Layer name="Model Detected Landfills" className="detected-layer" show={showDetectedLayer} setShow={setShowDetectedLayer} />
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 import axios from "axios";
 import L from "leaflet";
 
-import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { FaBars } from "react-icons/fa";
 
 import MarkerCluster from "./MarkerCluster";
@@ -28,10 +28,12 @@ function LandfillMap() {
   const [selectedLandfill, setSelectedLandfill] = useState(null);
   const [panelOpen, setPanelOpen] = useState({ state: true, type: "Serbia" });
   const [layersOpen, setLayersOpen] = useState(false);
-  const [showRegistryLayer, setShowRegistryLayer] = useState(false);
-  const [showDetectedLayer, setShowDetectedLayer] = useState(true);
-  const [proximityLandfills, setProximityLandfills] = useState([]);
 
+  const [showRegistryLayer, setShowRegistryLayerState] = useState({ sanitary: false, unsanitary: false });
+  const [showDetectedLayer, setShowDetectedLayerState] = useState({ sanitary: true, unsanitary: true });
+  const setShowDetectedLayer = useCallback((updater) => setShowDetectedLayerState(prev => typeof updater === "function" ? updater(prev) : updater ), []);
+  const setShowRegistryLayer = useCallback((updater) => setShowRegistryLayerState(prev => typeof updater === "function" ? updater(prev) : updater), []);
+  const [proximityLandfills, setProximityLandfills] = useState([]);
   const activeMarkerRef = useRef(null);
   const landfillProximityRef = useRef([]);
   const mapRef = useRef(null);
@@ -58,10 +60,8 @@ function LandfillMap() {
 
   const handleMarkerClick = async (id, map, source) => {
     let landfill;
-    const endpoint =
-      source === "registry"
-        ? `/api/registrylandfills/${id}`
-        : `/api/landfills/${id}`;
+    const endpoint = source === "registry" ? `/api/registrylandfills/${id}` : `/api/landfills/${id}`;
+
     await axios.get(endpoint)
       .then(res => { landfill = { ...res.data, id: id, source: source }; setSelectedLandfill(landfill); })
       .then(() => setPanelOpen({ state: true, type: "Landfill" }))
@@ -133,7 +133,7 @@ useEffect(() => {
 
       {border && <GeoJSON data={border} renderer={L.canvas()} style={{ color: "#864c19", weight: 2, fillOpacity: 0 }} />}
 
-      <MarkerCluster landfills={showDetectedLayer ? landfills : null} registryLandfills={showRegistryLayer ? registryLandfills : null} handleMarkerClick={handleMarkerClick} />
+      <MarkerCluster landfills={landfills} registryLandfills={registryLandfills} handleMarkerClick={handleMarkerClick} layersDetected={showDetectedLayer} layersRegistry={showRegistryLayer} />
 
       <UserPin activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen}  setProximityLandfills={setProximityLandfills} />
 

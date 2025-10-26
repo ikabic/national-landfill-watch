@@ -13,7 +13,7 @@ import "../css/MarkerCluster.css"
 const sanitaryIcon = makePinIcon("#2E7D32", "♻️");
 const unsanitaryIcon = makePinIcon("#d18135ff", "☣️");
 
-function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
+function MarkerCluster({ landfills, registryLandfills, handleMarkerClick, layersDetected, layersRegistry }) {
   const map = useMap();
 
   useEffect(() => {
@@ -22,17 +22,19 @@ function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
     const registryClusters = L.markerClusterGroup({ iconCreateFunction: makeClusterIcon("registry") });
     const detectedClusters = L.markerClusterGroup({ iconCreateFunction: makeClusterIcon("detected") });
 
-    if (landfills)
+    if (Object.values(layersDetected).some(v => v === true))
       landfills.forEach((lf) => {
-        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
+        if((lf.status === "Sanitary" && !layersDetected.sanitary) || (lf.status !== "Sanitary" && !layersDetected.unsanitary)) return;
+        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.status === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
           .on("click", () => handleMarkerClick(lf.id, map, "detected"));
 
         detectedClusters.addLayer(marker);
       });
 
-    if (registryLandfills)
+    if (Object.values(layersRegistry).some(v => v === true))
       registryLandfills.forEach((lf) => {
-        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.category === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
+      if((lf.status === "Sanitary" && !layersRegistry.sanitary) || (lf.status !== "Sanitary" && !layersRegistry.unsanitary)) return;
+        const marker = L.marker([lf.centerLat, lf.centerLon], { icon: lf.status === "Sanitary" ? sanitaryIcon : unsanitaryIcon })
           .on("click", () => handleMarkerClick(lf.id, map, "registry"));
 
         registryClusters.addLayer(marker);
@@ -45,7 +47,7 @@ function MarkerCluster({ landfills, registryLandfills, handleMarkerClick }) {
       map.removeLayer(detectedClusters);
       map.removeLayer(registryClusters);
     }
-  }, [landfills, registryLandfills, map, handleMarkerClick]);
+  }, [landfills, registryLandfills, map, handleMarkerClick, layersDetected, layersRegistry]);
 
   return null;
 }

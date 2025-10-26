@@ -18,15 +18,19 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
     return <InfoPanel title="Serbia Landfill Overview" open={open} onClose={onClose}
         actions={
             <>
-                <button className={`panel-btn bbox ${showBoundingBox ? "on" : ""}`}
-                    title="Show bounding box" onClick={() => setShowBoundingBox(!showBoundingBox)}>
-                    <LuSquareDashed />
-                </button>
+                {landfill?.source === "detected" && (
+                    <>
+                        <button className={`panel-btn bbox ${showBoundingBox ? "on" : ""}`}
+                            title="Show bounding box" onClick={() => setShowBoundingBox(!showBoundingBox)}>
+                            <LuSquareDashed />
+                        </button>
 
-                <button className={`panel-btn seg ${showBoundingPolygon ? "on" : ""}`}
-                    title="Show bounding polygon" onClick={() => setShowBoundingPolygon(!showBoundingPolygon)}>
-                    <PiPolygonBold />
-                </button>
+                        <button className={`panel-btn seg ${showBoundingPolygon ? "on" : ""}`}
+                            title="Show bounding polygon" onClick={() => setShowBoundingPolygon(!showBoundingPolygon)}>
+                            <PiPolygonBold />
+                        </button>
+                    </>
+                )}
 
                 <button className={`panel-btn zoom ${enableZoom ? "on" : ""}`}
                     title="Enable zoom" onClick={() => setEnableZoom(!enableZoom)}>
@@ -35,7 +39,7 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
             </>
         }
     >
-        {landfill && <LandfillImageCanvas imageName={landfill.imageName} geoJson={landfill.geoJson} segmentation={landfill.segmentation} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
+        {landfill && <LandfillImageCanvas landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
 
         <div className="info-panel-details">
             <div className="info-panel-details-section">

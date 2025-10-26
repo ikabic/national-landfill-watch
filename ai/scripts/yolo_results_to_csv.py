@@ -6,11 +6,11 @@ import csv
 import json
 from datetime import datetime
 from pyproj import Transformer
-from shapely.geometry import Polygon, Point, mapping
+from shapely.geometry import Polygon, Point, mapping, shape
 import math
 
 labels_folder = "test/full_labels"
-segmentation_folder = "segmentation"
+segmentation_folder = "seg2"
 output_csv = "test/data/full_dataset.csv"
 
 # --- UTM <-> WGS84 ---
@@ -96,13 +96,12 @@ for label_file in label_files:
         width_px = w * block_size
         height_px = h * block_size
 
-        # Bounding box
+        # Bounding box (ostaje za GeoJSON)
         x_min_px = center_x_px - width_px / 2
         y_min_px = center_y_px - height_px / 2
         x_max_px = center_x_px + width_px / 2
         y_max_px = center_y_px + height_px / 2
 
-        # GeoJSON
         polygon_coords = [
             (x_min_px, y_min_px),
             (x_min_px, y_max_px),
@@ -112,42 +111,57 @@ for label_file in label_files:
         ]
         polygon = Polygon(polygon_coords)
         bbox_geojson = mapping(polygon)
-        circle = Point(center_x_px, center_y_px).buffer(INFLUENCE_RADIUS_M)
-        circle_geojson = mapping(circle)
 
-        geojson_dict = {
-            "type": "FeatureCollection",
-            "features": [
-                {"type": "Feature", "geometry": bbox_geojson, "properties": {"type": "bbox"}},
-                {"type": "Feature", "geometry": circle_geojson, "properties": {"type": "influence", "influence_radius": INFLUENCE_RADIUS_M}}
-            ]
-        }
-        geojson_str = json.dumps(geojson_dict) 
+        # --- Centar u UTM -> lat/lon ---
+        utm_x, utm_y, _, _ = yolo_to_utm(row, col, xc, yc, w, h)
+        center_lat, center_lon = utm_to_latlon(utm_x, utm_y)
 
+        # --- Segmentacija ---
         seg_path = os.path.join(segmentation_folder, f"{basename}.geojson")
         if os.path.exists(seg_path):
             with open(seg_path, "r") as sf:
                 seg_data = json.load(sf)
-                segmentation_str = json.dumps(seg_data)  
+                geometries = [shape(f["geometry"]) for f in seg_data["features"]]
+                area_m2 = sum(geom.area for geom in geometries)  # ukupna površina svih poligona
+                # bounds za prikaz ili druge potrebe: možeš uzeti minimalni bounding box
+                minx = min(geom.bounds[0] for geom in geometries)
+                miny = min(geom.bounds[1] for geom in geometries)
+                maxx = max(geom.bounds[2] for geom in geometries)
+                maxy = max(geom.bounds[3] for geom in geometries)
+                width_px = maxx - minx
+                height_px = maxy - miny
+                segmentation_str = json.dumps(seg_data)
         else:
+            area_m2 = width_px * height_px
             segmentation_str = 'null'
 
-        # Centar u UTM -> lat/lon
-        utm_x, utm_y, _, _ = yolo_to_utm(row, col, xc, yc, w, h)
-        center_lat, center_lon = utm_to_latlon(utm_x, utm_y)
-
-        # Površina, zapremina, masa
-        area_m2 = width_px * height_px
+        # --- Zapremina i masa ---
         volume_m3 = area_m2 * AVERAGE_HEIGHT_M
         total_mass_ton = volume_m3 * MSW_DENSITY_TON_PER_M3
 
+        # --- Influence radius proporcionalan zapremini ---
+        influence_radius = (volume_m3 ** (1/3)) * 2  # cube root od zapremine, puta faktor
+
+        # --- FOD emisija ---
         life_years = current_year - START_YEAR
         amswx = total_mass_ton / life_years
         annual_ch4, annual_co2e = calc_fod_emission(amswx, K, life_years, MCF, DOC, F, CO2_EQ)
 
+        # --- GeoJSON circle ---
+        circle = Point(center_x_px, center_y_px).buffer(influence_radius)
+        circle_geojson = mapping(circle)
+        geojson_dict = {
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "geometry": bbox_geojson, "properties": {"type": "bbox"}},
+                {"type": "Feature", "geometry": circle_geojson, "properties": {"type": "influence", "influence_radius": influence_radius}}
+            ]
+        }
+        geojson_str = json.dumps(geojson_dict)
+
         landfill = {
             "image_name": basename,
-            "status": "detected",
+            "status": "Unsanitary",
             "start_year": START_YEAR,
             "life_years": life_years,
             "area_m2": round(area_m2, 2),
@@ -161,7 +175,7 @@ for label_file in label_files:
             "center_lat": center_lat,
             "center_lon": center_lon,
             "geom": f"POINT({center_lon} {center_lat})",
-            "influence_radius": INFLUENCE_RADIUS_M,
+            "influence_radius": influence_radius,
             "center_x_px": center_x_px,
             "center_y_px": center_y_px,
             "width_px": width_px,
@@ -169,6 +183,7 @@ for label_file in label_files:
         }
 
         all_rows.append(landfill)
+
 
 # --- Snimanje u CSV ---
 os.makedirs(os.path.dirname(output_csv), exist_ok=True)
