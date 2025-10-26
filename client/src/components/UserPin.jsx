@@ -1,10 +1,13 @@
 import L from "leaflet";
+
 import { useMapEvents } from "react-leaflet";
 import { makePinIcon } from "../utils/makePinIcon";
 import { haversineDistance } from "../utils/distance";
+import { shiftMapCenter } from "../utils/shiftMapCenter";
+
 import LandfillProximity from "./LandfillProximity";
 
-function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills }) {
+function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, layersOpen }) {
   const userIcon = makePinIcon("#b52727ff", "⬤");
 
   const map = useMapEvents({
@@ -27,20 +30,16 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
       } else {
         const res = await fetch("/api/landfills/markers");
         const allLandfills = await res.json();
+
         const nearest = allLandfills
-          .map(lf => ({
-            ...lf,
-            distance: haversineDistance(e.latlng.lat, e.latlng.lng, lf.centerLat, lf.centerLon),
-            id: lf.id,
-            source: "detected"
-          }))
+          .map(lf => ({ ...lf, distance: haversineDistance(e.latlng.lat, e.latlng.lng, lf.centerLat, lf.centerLon), id: lf.id, source: "detected" }))
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 3);
 
         setProximityLandfills(nearest);
       }
-
       setPanelOpen({ state: true, type: "Proximity" });
+      shiftMapCenter(map, true, layersOpen, [e.latlng.lat, e.latlng.lng]);
     }
   });
 

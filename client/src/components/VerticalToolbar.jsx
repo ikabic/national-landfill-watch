@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { useMap } from "react-leaflet";
 import { FaMap, FaLayerGroup, FaAngleDown } from "react-icons/fa";
 
 import LocateMeButton from "./LocateMeButton";
 
 import "../css/VerticalToolbar.css";
 
-function VerticalToolbar({ activeMarkerRef, landfillProximityRef, setLayersOpen, setPanelOpen, setProximityLandfills }) {
+function VerticalToolbar({ activeMarkerRef, landfillProximityRef, setLayersOpen, setPanelOpen, setProximityLandfills, handleCenterMap, layersOpen }) {
     const [expanded, setExpanded] = useState(true);
-    const map = useMap();
 
     return <div className={`toolbar ${expanded ? "expanded" : "collapsed"}`}>
          <button className={`toolbar-btn toggle ${expanded ? "rotated" : ""}`} onClick={() => setExpanded(!expanded)} title="Toggle toolbar">
@@ -16,8 +14,8 @@ function VerticalToolbar({ activeMarkerRef, landfillProximityRef, setLayersOpen,
         </button>
 
         <div className="toolbar-buttons">
-            <button onClick={() => map.flyTo([44.8176, 20.4569], 8, { duration: 1.5 })}><FaMap/></button>
-            <LocateMeButton activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} setProximityLandfills={setProximityLandfills} />
+            <button onClick={handleCenterMap}><FaMap/></button>
+            <LocateMeButton activeMarkerRef={activeMarkerRef} landfillProximityRef={landfillProximityRef} setPanelOpen={setPanelOpen} setProximityLandfills={setProximityLandfills} layersOpen={layersOpen} />
             <button onClick={() => setLayersOpen(true)}><FaLayerGroup /></button>
         </div>
     </div>

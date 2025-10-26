@@ -1,14 +1,15 @@
 import axios from "axios";
 import L from "leaflet";
-import { haversineDistance } from "../utils/distance";
 
+import { haversineDistance } from "../utils/distance";
 import { useMap } from "react-leaflet";
 import { FaLocationArrow } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
+import { shiftMapCenter } from "../utils/shiftMapCenter";
 
 import LandfillProximity from "./LandfillProximity";
 
-function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills }) {
+function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProximityLandfills, layersOpen }) {
     const map = useMap();
 
     const handleLocate = () => {
@@ -20,7 +21,7 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, s
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
                 const { latitude, longitude } = pos.coords;
-                map.flyTo([latitude, longitude], 16, { duration: 1.5 });
+                shiftMapCenter(map, true, layersOpen, [latitude, longitude], 16);
 
                 if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
                 landfillProximityRef.current.forEach(c => map.removeLayer(c));
@@ -36,12 +37,7 @@ function LocateMeButton({ activeMarkerRef, landfillProximityRef, setPanelOpen, s
                     const allLandfills = res.data;
 
                     const nearest = allLandfills
-                        .map(lf => ({
-                            ...lf,
-                            distance: haversineDistance(latitude, longitude, lf.centerLat, lf.centerLon),
-                            id: lf.id,
-                            source: "detected"
-                        }))
+                        .map(lf => ({ ...lf, distance: haversineDistance(latitude, longitude, lf.centerLat, lf.centerLon), id: lf.id, source: "detected" }))
                         .sort((a, b) => a.distance - b.distance)
                         .slice(0, 3);
 

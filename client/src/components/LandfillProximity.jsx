@@ -1,5 +1,6 @@
 import axios from "axios";
 import L from "leaflet";
+
 import { haversineDistance } from "../utils/distance";
 
 export default async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = null) {
@@ -13,10 +14,7 @@ export default async function LandfillProximity(map, lat, lng, color = "#b93b37c
       const influenceFeature = geoJsonData.features.find(f => f.properties.type === "influence");
       const influenceRadius = influenceFeature?.properties?.influence_radius || 2000;
 
-      landfills.push({
-        ...single,
-        influenceRadius
-      });
+      landfills.push({ ...single, influenceRadius });
     } else {
       const response = await axios.get("/api/landfills/check-point", { params: { lat, lon: lng } });
       landfills = response.data;
@@ -39,16 +37,7 @@ export default async function LandfillProximity(map, lat, lng, color = "#b93b37c
       interactive: false
     }).addTo(map);
 
-    return {
-      ...lf,
-      distance,
-      inInfluence: distance <= influenceRadius,
-      area,
-      influenceRadius,
-      id: lf.id,
-      source: lf.source || "detected"
-    };
+    return { ...lf, distance, inInfluence: distance <= influenceRadius, area, influenceRadius, id: lf.id, source: lf.source || "detected" };
   });
-
   return results;
 }

@@ -3,7 +3,6 @@ import L from "leaflet";
 import { haversineDistance } from "../utils/distance";
 
 import { useState, useRef, useEffect } from "react";
-import { useMap } from "react-leaflet";
 import { FaSearch } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
 import { handleMapInteractions } from "../utils/handleMapInteractions";
@@ -53,6 +52,7 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) 
     setQuery(place.display_name);
     setSuggestions([]);
     enableMapInteractions();
+    
     const map = mapRefs.map.current;
     if (!map) return;
 
@@ -67,30 +67,30 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) 
     mapRefs.activeMarkerRef.current = newMarker;
 
     map.setView([lat, lon], 16);
-    const landfills = await LandfillProximity(map, lat, lon); 
+    const landfills = await LandfillProximity(map, lat, lon);
     if (!landfills || landfills.length === 0) {
-       const res = await axios.get("/api/landfills/markers");
-       const allLandfills = res.data;
+      const res = await axios.get("/api/landfills/markers");
+      const allLandfills = res.data;
 
-       const nearest = allLandfills
-          .map(lf => ({
-              ...lf,
-              distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon),
-              id: lf.id,
-              source: "detected"
-         }))
-         .sort((a, b) => a.distance - b.distance)
-         .slice(0, 3);
+      const nearest = allLandfills
+        .map(lf => ({
+          ...lf,
+          distance: haversineDistance(lat, lon, lf.centerLat, lf.centerLon),
+          id: lf.id,
+          source: "detected"
+        }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 3);
 
       setProximityLandfills(nearest);
-      
-       setPanelOpen({ state: true, type: "Proximity" });
-     } else {
- 
-       setProximityLandfills(landfills);
-       landfills.forEach(lf => {if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area);});
+
       setPanelOpen({ state: true, type: "Proximity" });
-     }
+    } else {
+
+      setProximityLandfills(landfills);
+      landfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
+      setPanelOpen({ state: true, type: "Proximity" });
+    }
 
   };
 
@@ -112,7 +112,6 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills }) 
         {suggestions.length > 0 && (
           <ul className="suggestions-list">
             {suggestions.map((place, idx) => {
-              console.log(place.address)
               const addr = place.address || {};
               const village = addr.village || "";
               const city = addr.town || addr.city || "";
