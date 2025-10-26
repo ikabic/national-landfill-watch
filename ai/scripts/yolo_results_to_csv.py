@@ -11,7 +11,7 @@ import math
 
 labels_folder = "test/full_labels"
 segmentation_folder = "seg2"
-output_csv = "test/data/full_dataset.csv"
+output_csv = "test/data/full_dataset2.csv"
 
 # --- UTM <-> WGS84 ---
 transformer_to_wgs = Transformer.from_crs("EPSG:32634", "EPSG:4326", always_xy=True)
@@ -23,16 +23,15 @@ block_size = tile_size * tiles_per_block  # 512 px blok (1 px = 1 m)
 xmin, ymax = 331367, 5117462  # NW corner
 
 # --- Konstantne vrednosti ---
-AVERAGE_HEIGHT_M = 2.5
-MSW_DENSITY_TON_PER_M3 = 0.4
+MSW_DENSITY_TON_PER_M3 = 0.7
 START_YEAR = 2005
 current_year = datetime.now().year
-K = 0.05
-MCF = 0.5
-DOC = 0.15
+K = 0.1
+MCF = 0.6
+DOC = 0.218
+DOCF = 0.5
 F = 0.5
-CO2_EQ = 25
-INFLUENCE_RADIUS_M = 150  # radius u metrima
+CO2_EQ = 28
 
 # --- YOLO -> UTM ---
 def yolo_to_utm(row, col, x_center_norm, y_center_norm, w_norm, h_norm):
@@ -49,16 +48,31 @@ def utm_to_latlon(utm_x, utm_y):
     lon, lat = transformer_to_wgs.transform(utm_x, utm_y)
     return lat, lon
 
-# --- FOD metan model ---
-def calc_fod_emission(amsw, k, years, mcf, doc, f, co2_eq):
+def estimate_volume(area_m2, min_height=0.7, max_height=12.0, min_area=500, max_area=63000):
+
+    clamped_area = max(min(area_m2, max_area), min_area)
+
+    height = min_height + (clamped_area - min_area) / (max_area - min_area) * (max_height - min_height)
+
+    volume_m3 = area_m2 * height
+    return volume_m3
+
+def calc_fod_emission(msw_per_year, k, years, mcf, doc, f, co2_eq):
     ch4_total = 0
-    for t in range(years):
-        ch4_t = amsw * (1 - math.exp(-k)) * (1 - math.exp(-k * t)) * mcf * doc * f
+    L0 = DOC * DOCF * F * (16.0 / 12.0)
+
+    for t in range(1, years + 1):
+        ch4_t = 0
+        for x in range(1, t + 1):
+            ch4_t += msw_per_year * L0 * k * math.exp(-k * (t - x)) * mcf
         ch4_total += ch4_t
+
     co2e_total = ch4_total * co2_eq
     annual_ch4 = ch4_total / years
     annual_co2e = co2e_total / years
+
     return round(annual_ch4, 2), round(annual_co2e, 2)
+
 
 # --- Glavni loop ---
 all_rows = []
@@ -87,7 +101,7 @@ for label_file in label_files:
             continue
         class_id, xc, yc, w, h, conf = parts
 
-        if conf < 0.6: 
+        if conf < 0.67: 
             continue
 
         # --- YOLO u piksele ---
@@ -136,16 +150,26 @@ for label_file in label_files:
             segmentation_str = 'null'
 
         # --- Zapremina i masa ---
-        volume_m3 = area_m2 * AVERAGE_HEIGHT_M
+        volume_m3 = estimate_volume(area_m2)
         total_mass_ton = volume_m3 * MSW_DENSITY_TON_PER_M3
 
-        # --- Influence radius proporcionalan zapremini ---
-        influence_radius = (volume_m3 ** (1/3)) * 2  # cube root od zapremine, puta faktor
+        def map_methane_to_radius(ch4_tons_per_year, a=None, b=None):
+            if a is None:
+                a = 90.9
+            if b is None:
+                b = 72.7
+
+            R = a * math.sqrt(ch4_tons_per_year) + b
+
+            R = max(50, R)
+            return R
 
         # --- FOD emisija ---
         life_years = current_year - START_YEAR
         amswx = total_mass_ton / life_years
         annual_ch4, annual_co2e = calc_fod_emission(amswx, K, life_years, MCF, DOC, F, CO2_EQ)
+
+        influence_radius = map_methane_to_radius(annual_ch4)
 
         # --- GeoJSON circle ---
         circle = Point(center_x_px, center_y_px).buffer(influence_radius)
