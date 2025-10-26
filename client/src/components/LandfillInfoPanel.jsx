@@ -20,7 +20,7 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
     return <InfoPanel title="Serbia Landfill Overview" open={open} onClose={onClose}
         actions={
             <>
-                {landfill?.source === "detected" && (
+                {landfill?.source === "detected" && landfill?.status != "Sanitary" && (
                     <>
                         <button className={`panel-btn bbox ${showBoundingBox ? "on" : ""}`}
                             title="Show bounding box" onClick={() => setShowBoundingBox(!showBoundingBox)}>
@@ -34,7 +34,7 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
                     </>
                 )}
 
-                <button className={`panel-btn zoom ${enableZoom ? "on" : ""} ${landfill.source !== "detected" ? "registry" : ""}`}
+                <button className={`panel-btn zoom ${enableZoom ? "on" : ""} ${landfill.source !== "detected" || landfill.status == "Sanitary" ? "registry" : ""}`}
                     title="Enable zoom" onClick={() => setEnableZoom(!enableZoom)}>
                     <LuFocus />
                 </button>

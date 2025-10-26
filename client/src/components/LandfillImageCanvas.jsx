@@ -24,7 +24,7 @@ function LandfillImageCanvas({ landfill, showBoundingBox = true, showBoundingPol
 
         img.onload = () => {
         let coords = [];
-        if (landfill.source === "detected") {
+        if (landfill.source === "detected" && landfill.status != "Sanitary") {
           try {
             const geo = JSON.parse(geoJson);
             coords = geo.features.find(f => f.properties.type === "bbox")?.geometry?.coordinates?.[0] || [];
@@ -46,7 +46,7 @@ function LandfillImageCanvas({ landfill, showBoundingBox = true, showBoundingPol
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, cropY, img.width, cropH, 0, 0, canvas.width, scaledHeight);
 
-          if (landfill.source === "detected") {
+          if (landfill.source === "detected" && landfill.status != "Sanitary") {
             if (showBoundingBox && coords.length > 0) {
               ctx.beginPath();
               coords.forEach(([x, y], i) => {
