@@ -1,22 +1,54 @@
 import axios from "axios";
 import L from "leaflet";
+import { haversineDistance } from "../utils/distance";
 
-async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = null) { 
-    if (!map) return [];
-    let landfills = [];
+export default async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = null) {
+  if (!map) return [];
 
-    if (single) landfills.push({...single, influenceRadius: JSON.parse(single.geoJson).features.find(f => f.properties.type === "influence").properties['influence_radius'] });
-    else
-        try {
-            const response = await axios.get("/api/landfills/check-point", { params: { lat: lat, lon: lng } });
-            landfills = response.data;
-            if (landfills.length === 0) return;
-        } catch (err) { console.error(err); }
-        
-    const areas = landfills.map(lf =>
-        L.circle([lf.centerLat, lf.centerLon], { radius: lf.influenceRadius, color, weight: 2, fillOpacity: 0.2, interactive: false }).addTo(map)
-    );
-    return areas;
-};
+  let landfills = [];
 
-export default LandfillProximity;
+  try {
+    if (single) {
+      const geoJsonData = JSON.parse(single.geoJson);
+      const influenceFeature = geoJsonData.features.find(f => f.properties.type === "influence");
+      const influenceRadius = influenceFeature?.properties?.influence_radius || 2000;
+
+      landfills.push({
+        ...single,
+        influenceRadius
+      });
+    } else {
+      const response = await axios.get("/api/landfills/check-point", { params: { lat, lon: lng } });
+      landfills = response.data;
+      if (!landfills || landfills.length === 0) return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch landfills for proximity:", err);
+    return [];
+  }
+
+  const results = landfills.map(lf => {
+    const influenceRadius = lf.influenceRadius || 2000;
+    const distance = haversineDistance(lat, lng, lf.centerLat, lf.centerLon);
+
+    const area = L.circle([lf.centerLat, lf.centerLon], {
+      radius: influenceRadius,
+      color,
+      weight: 2,
+      fillOpacity: 0.2,
+      interactive: false
+    }).addTo(map);
+
+    return {
+      ...lf,
+      distance,
+      inInfluence: distance <= influenceRadius,
+      area,
+      influenceRadius,
+      id: lf.id,
+      source: lf.source || "detected"
+    };
+  });
+
+  return results;
+}

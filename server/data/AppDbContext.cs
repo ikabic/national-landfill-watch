@@ -10,6 +10,7 @@ namespace server.data
     {
         public DbSet<Landfill> Landfills { get; set; }
         public DbSet<RegistryLandfill> RegistryLandfills { get; set; }
+        public DbSet<LandfillNearestDto> LandfillNearestDto { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options)

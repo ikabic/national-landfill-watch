@@ -248,5 +248,28 @@ namespace server.controllers
 
             return Ok(chartData);
         }
+
+        [HttpGet("nearest")]
+        public async Task<IActionResult> GetNearest([FromQuery] double lat, [FromQuery] double lon, [FromQuery] int limit = 3)
+        {
+             var nearestLandfills = await _context.LandfillNearestDto.FromSqlInterpolated($@"
+               SELECT 
+                   l.id AS ""Id"",
+                   l.image_name AS ""ImageName"",
+                   l.status AS ""Status"",
+                   l.center_lat AS ""CenterLat"",
+                   l.center_lon AS ""CenterLon"",
+                   ST_Distance(
+                       l.geom,
+                       ST_SetSRID(ST_MakePoint({lon}, {lat}), 4326)::geography
+                   ) AS ""DistanceMeters""
+               FROM ""landfills"" AS l
+               WHERE l.geom IS NOT NULL
+               ORDER BY ""DistanceMeters""
+               LIMIT {limit}
+           ").ToListAsync();
+
+           return Ok(nearestLandfills);
+        }
     }
 }
