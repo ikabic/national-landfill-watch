@@ -13,6 +13,8 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
     const [showBoundingPolygon, setShowBoundingPolygon] = useState(true);
     const [enableZoom, setEnableZoom] = useState(false);
 
+    const formatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
     if (!landfill) return;
 
     return <InfoPanel title="Serbia Landfill Overview" open={open} onClose={onClose}
@@ -32,14 +34,14 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
                     </>
                 )}
 
-                <button className={`panel-btn zoom ${enableZoom ? "on" : ""}`}
+                <button className={`panel-btn zoom ${enableZoom ? "on" : ""} ${landfill.source !== "detected" ? "registry" : ""}`}
                     title="Enable zoom" onClick={() => setEnableZoom(!enableZoom)}>
                     <LuFocus />
                 </button>
             </>
         }
     >
-        {landfill && <LandfillImageCanvas landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
+        {landfill && <LandfillImageCanvas className="info-panel-image" landfill={landfill} showBoundingBox={showBoundingBox} showBoundingPolygon={showBoundingPolygon} enableZoom={enableZoom} />}
 
         <div className="info-panel-details" id="landfill">
             <div className="info-panel-details-section">
@@ -49,13 +51,13 @@ function LandfillInfoPanel({ open, onClose, landfill }) {
             </div>
 
             <div className="info-panel-details-section">
-                <p>Estimated area<span>{landfill.areaM2} m²</span></p>
-                <p>Estimated volume<span>{landfill.volumeM3} m³</span></p>
+                <p>Estimated area<span>{formatter.format(landfill.areaM2)} m²</span></p>
+                <p>Estimated volume<span>{formatter.format(landfill.volumeM3)} m³</span></p>
             </div>
 
             <div className="info-panel-details-section">
-                <p>Estimated CH₄ emissions<span>{landfill.annualCH4Tonnes} ton/year</span></p>
-                <p>Estimated CH₄ emissions (CO₂eq)<span>{landfill.annualCO2eTonnes} ton/year</span></p>
+                <p>Estimated CH₄ emissions<span>{formatter.format(landfill.annualCH4Tonnes)} ton/year</span></p>
+                <p>Estimated CH₄ emissions (CO₂eq)<span>{formatter.format(landfill.annualCO2eTonnes)} ton/year</span></p>
             </div>
         </div>
     </InfoPanel>

@@ -18,9 +18,11 @@ import VerticalToolbar from "./VerticalToolbar";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
 import LayerPanel from "./LayerPanel";
+import EduInfoPanel from "./EduInfoPanel";
 
 import "leaflet/dist/leaflet.css";
 import "../css/LandfillMap.css";
+
 
 function LandfillMap() {
   const [landfills, setLandfills] = useState([]);
@@ -117,7 +119,8 @@ function LandfillMap() {
 
     <LandfillInfoPanel open={panelOpen.type === "Landfill" && panelOpen.state} landfill={selectedLandfill} onClose={() => setPanelOpen({ state: false, type: "" })} />
     <SerbiaInfoPanel open={panelOpen.type === "Serbia" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} />
-    <ProximityInfoPanel open={panelOpen.state && panelOpen.type === "Proximity"} onClose={() => setPanelOpen({ state: false, type: "" })} landfills={proximityLandfills} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} />
+    <ProximityInfoPanel open={panelOpen.type === "Proximity" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} landfills={proximityLandfills} onLandfillClick={(id) => handleMarkerClick(id, mapRef?.current, "detected")} setPanelOpen={setPanelOpen} />
+    <EduInfoPanel open={panelOpen.type === "Info" && panelOpen.state} onClose={() => setPanelOpen({ state: false, type: "" })} />
   </>
 }
 

@@ -3,7 +3,7 @@ import L from "leaflet";
 
 import { haversineDistance } from "../utils/havesineDistance";
 import { useState, useRef, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaInfo } from "react-icons/fa";
 import { makePinIcon } from "../utils/makePinIcon";
 import { handleMapInteractions } from "../utils/handleMapInteractions";
 
@@ -40,7 +40,10 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
         const res = await axios.get("https://nominatim.openstreetmap.org/search", {
           params: { q: debouncedQuery, format: "json", addressdetails: 1, countrycodes: "RS", limit: 5 }
         });
-        setSuggestions(res.data);
+        setSuggestions(res.data.filter(
+          (place, index, self) =>
+            index === self.findIndex((p) => p.display_name === place.display_name || (p.lat === place.lat && p.lon === place.lon))
+        ));
       } catch (err) { console.error("Error fetching search suggestions:", err); }
     };
 
@@ -92,52 +95,50 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
     }
   };
 
-  return <div className={`searchbar ${panelOpen.state ? "shifted" : ""} ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
-    <button onClick={() => setExpanded(!expanded)}> <FaSearch /> </button>
+  return <div className={`actions ${panelOpen.state ? "shifted" : ""}`}>
+    <button className="info-btn" onClick={() => setPanelOpen({ state: true, type: "Info" })}><FaInfo /></button>
 
-    {expanded && (
-      <div className="search-input-wrapper">
+    <div className={`searchbar ${expanded ? "expanded" : "collapsed"}`} onMouseEnter={disableMapInteractions} onMouseLeave={enableMapInteractions}>
+      <button onClick={() => setExpanded(!expanded)}><FaSearch /></button>
+
+      {expanded && <div className="search-input-wrapper">
         <input ref={inputRef} type="text" value={query} title={query} placeholder="Search for location..."
           onChange={async (e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} onFocus={() => inputRef.current?.select()} />
 
-        {suggestions.length > 0 && (
-          <ul className="suggestions-list">
-            {suggestions.map((place, idx) => {
-              const addr = place.address || {};
+        {suggestions.length > 0 && <ul className="suggestions-list">
+          {suggestions.map((place, idx) => {
+            const addr = place.address || {};
 
-              const name =
-                addr.road ||
-                addr.pedestrian ||
-                addr.neighbourhood ||
-                addr.suburb ||
-                addr.village ||
-                addr.town ||
-                addr.city ||
-                addr.municipality ||
-                addr.county ||
-                addr.state_district ||
-                addr.state ||
-                place.display_name;
+            const name =
+              addr.road ||
+              addr.pedestrian ||
+              addr.neighbourhood ||
+              addr.suburb ||
+              addr.village ||
+              addr.town ||
+              addr.city ||
+              addr.municipality ||
+              addr.county ||
+              addr.state_district ||
+              addr.state ||
+              place.display_name;
 
-              const parts = [
-                addr.road || addr.neighbourhood || addr.suburb,
-                addr.village || addr.town || addr.city,
-                addr.state || addr.county,
-                addr.country_code?.toUpperCase() === "RS" ? "Srbija" : addr.country,
-              ].filter(Boolean);
+            const parts = [
+              addr.road || addr.neighbourhood || addr.suburb,
+              addr.village || addr.town || addr.city,
+              addr.state || addr.county,
+              addr.country_code?.toUpperCase() === "RS" ? "Srbija" : addr.country,
+            ].filter(Boolean);
 
-              const displayText = parts.join(", ");
+            const displayText = parts.join(", ");
 
-              return (
-                <li key={idx} onClick={() => handleSelect(place)}>
-                  {displayText || name}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+            return <li key={idx} onClick={() => handleSelect(place)}>{displayText || name}</li>
+          })}
+        </ul>
+        }
       </div>
-    )}
+      }
+    </div>
   </div>
 }
 

@@ -4,7 +4,7 @@
   gap: 6px;
 }
 
-.zoom-controls button, .panel-btn, .toolbar button, .searchbar button {
+.zoom-controls button, .panel-btn, .toolbar button, .searchbar button, .info-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -19,12 +19,12 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.zoom-controls button:hover, .panel-btn:hover, .toolbar button:hover, .searchbar button:hover {
+.zoom-controls button:hover, .panel-btn:hover, .toolbar button:hover, .searchbar button:hover, .info-btn:hover {
   background-color: var(--brand-secondary);
   transform: scale(1.05);
 }
 
-.zoom-controls button:active, .panel-btn:active, .toolbar button:active, .searchbar button:active {
+.zoom-controls button:active, .panel-btn:active, .toolbar button:active, .searchbar button:active, .info-btn:active {
   background-color: var(--brand-secondary);
   transform: scale(0.95);
 }

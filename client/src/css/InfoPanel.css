@@ -53,11 +53,15 @@
     }
 
     .info-panel-details#landfill {
-        max-height: calc(20vh);
+        max-height: 20vh;
     }
 
     .info-panel-details#serbia {
-        max-height: calc(50vh);
+        max-height: 50vh;
+    }
+
+    .info-panel-details#info {
+        max-height: 35vh;
     }
 }
 
@@ -87,6 +91,10 @@
 
 .panel-btn.zoom {
     top: 218px;
+}
+
+.panel-btn.zoom.registry {
+    top: 158px;
 }
 
 .panel-btn.bbox.on,
@@ -120,6 +128,7 @@
 }
 
 .info-panel p,
+.info-panel a,
 .info-panel h2,
 .info-panel h4,
 .info-panel span {
@@ -141,7 +150,7 @@
     border-top: 1px solid var(--brand-secondary);
 }
 
-.info-panel-details-section:not(:last-child) {
+.info-panel-details-section:not(:last-child), .info-panel-image {
     border-bottom: 1px solid var(--brand-secondary);
 }
 
@@ -164,4 +173,23 @@
 
 .info-panel-listitem {
     margin: 16px 0;
+}
+
+.info-links {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.info-panel a {
+    color: #1c4479;
+}
+
+.info-panel a:hover {
+    color: #320d68;
+}
+
+.info-links .link-icon {
+    vertical-align: top;
+    margin-top: 3px;
 }

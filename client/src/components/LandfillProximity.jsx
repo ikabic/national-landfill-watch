@@ -3,7 +3,7 @@ import L from "leaflet";
 
 import { haversineDistance } from "../utils/havesineDistance";
 
-export default async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = null) {
+export default async function LandfillProximity(map, lat, lng, color = "#b93b37c4", single = undefined) {
   if (!map) return [];
 
   let landfills = [];

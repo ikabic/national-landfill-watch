@@ -11,7 +11,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
 
   const map = useMapEvents({
     click: async (e) => {
-      if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn, .searchbar")) return;
+      if (e.originalEvent.target.closest(".map-controls, .pin, .panel-btn, .actions")) return;
 
       if (activeMarkerRef.current) map.removeLayer(activeMarkerRef.current);
 
@@ -27,7 +27,7 @@ function UserPin({ activeMarkerRef, landfillProximityRef, setPanelOpen, setProxi
         landfillProximityRef.current.push(...landfills.map(lf => lf.area));
         setProximityLandfills(landfills);
       } else {
-        const res = await fetch("/api/landfills/markers");
+        const res = await fetch("/api/landfills");
         const allLandfills = await res.json();
 
         const nearest = allLandfills

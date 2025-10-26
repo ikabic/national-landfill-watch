@@ -34,6 +34,10 @@
     .layer-panel.open {
         transform: translateY(0);
     }
+
+    .layer-panel-content {
+        max-height: 45vh;
+    }
 }
 
 .layer-panel-sidebar {
@@ -47,6 +51,9 @@
 
 .panel-content {
     padding: 2.5rem 1rem 1rem;
+}
+
+.layer-panel-content {
     overflow-y: auto;
 }
 
