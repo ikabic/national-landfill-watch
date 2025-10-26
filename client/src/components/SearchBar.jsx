@@ -83,8 +83,8 @@ function SearchBar({ panelOpen, mapRefs, setPanelOpen, setProximityLandfills, on
 
       setProximityLandfills(nearest);
     } else {
-      setProximityLandfills(filteredLandfills);
-      filteredLandfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
+      setProximityLandfills(landfills);
+      landfills.forEach(lf => { if (lf.area) mapRefs.landfillProximityRef.current.push(lf.area); });
     }
     setPanelOpen({ state: true, type: "Proximity" });
   };
