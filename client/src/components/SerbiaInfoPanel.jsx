@@ -14,6 +14,8 @@ function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
     const [topLandfills, setTopLandfills] = useState([]);
     const [chartData, setChartData] = useState([]);
 
+    const formatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
     const massChartRef = useRef(null);
     const massChartInstance = useRef(null);
 
@@ -81,7 +83,7 @@ function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
                 responsive: true,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { title: { display: true, text: "Mass (t)" } },
+                    x: { title: { display: true, text: "Mass (ton)" } },
                     y: { title: { display: true, text: "Number of Landfills" }, beginAtZero: true }
                 }
             }
@@ -96,25 +98,25 @@ function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
         <div className="info-panel-details" id="serbia">
             {stats && <>
                 <div className="info-panel-details-section">
-                    <span>Total Landfills: {stats.totalLandfills}</span>
+                    <span>Total Landfills: {formatter.format(stats.totalLandfills)}</span>
                 </div>
 
                 <div className="info-panel-details-section">
-                    <p>Average area<span> {stats.avgAreaM2.toFixed(2)} m²</span></p>
-                    <p>Average volume<span> {stats.avgVolumeM3.toFixed(2)} m³</span></p>
+                    <p>Average area<span> {formatter.format(stats.avgAreaM2.toFixed(2))} m²</span></p>
+                    <p>Average volume<span> {formatter.format(stats.avgVolumeM3.toFixed(2))} m³</span></p>
                 </div>
 
                 <div className="info-panel-details-section">
-                    <p>Average mass<span> {stats.avgTotalMassTon.toFixed(2)} ton</span></p>
-                    <p>Total mass<span> {stats.sumTotalMassTon.toFixed(2)} ton</span></p>
+                    <p>Average mass<span> {formatter.format(stats.avgTotalMassTon.toFixed(2))} ton</span></p>
+                    <p>Total mass<span> {formatter.format(stats.sumTotalMassTon.toFixed(2))} ton</span></p>
                 </div>
 
                 <div className="info-panel-details-section">
-                    <p>Average CH₄ emissions<span> {stats.avgAnnualCH4Tonnes.toFixed(2)} ton/year</span></p>
-                    <p>Total CH₄ emissions<span> {stats.sumAnnualCH4Tonnes.toFixed(2)} ton/year</span></p>
+                    <p>Average CH₄ emissions<span> {formatter.format(stats.avgAnnualCH4Tonnes.toFixed(2))} ton/year</span></p>
+                    <p>Total CH₄ emissions<span> {formatter.format(stats.sumAnnualCH4Tonnes.toFixed(2))} ton/year</span></p>
                     <br />
-                    <p>Average CH₄ emissions (CO₂eq)<span> {stats.avgAnnualCO2eTonnes.toFixed(2)} ton/year</span></p>
-                    <p>Total CH₄ emissions (CO₂eq)<span> {stats.sumAnnualCO2eTonnes.toFixed(2)} ton/year</span></p>
+                    <p>Average CH₄ emissions (CO₂eq)<span> {formatter.format(stats.avgAnnualCO2eTonnes.toFixed(2))} ton/year</span></p>
+                    <p>Total CH₄ emissions (CO₂eq)<span> {formatter.format(stats.sumAnnualCO2eTonnes.toFixed(2))} ton/year</span></p>
                 </div>
             </>
             }
@@ -124,10 +126,10 @@ function SerbiaInfoPanel({ open, onClose, onLandfillClick }) {
                 {topLandfills.map(lf => <div key={lf.id} className="info-panel-listitem">
                     <span className="route" onClick={() => onLandfillClick(lf.id)}>{lf.status} Landfill ID {lf.id}</span>
                     <p style={{ textAlign: "center", justifyContent: "center" }}><small>
-                        Area: {lf.areaM2?.toFixed(2)} m²
+                        Area: {formatter.format(lf.areaM2?.toFixed(2))} m²
                         <br />
-                        Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;
-                        CH₄: {lf.annualCH4Tonnes?.toFixed(2)} ton/year
+                        Mass: {formatter.format(lf.totalMassTon?.toFixed(2))} ton&nbsp;&nbsp;•&nbsp;
+                        CH₄: {formatter.format(lf.annualCH4Tonnes?.toFixed(2))} ton/year
                     </small></p>
                 </div>
                 )}

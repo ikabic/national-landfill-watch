@@ -8,6 +8,10 @@
   align-items: center;
 }
 
+.searchbar input {
+  width: 90%;
+}
+
 .search-input-wrapper {
   position: relative;
   width: 100%;
@@ -30,7 +34,7 @@
 }
 
 .searchbar.expanded {
-  width: 240px;
+  width: 400px;
 }
 
 .actions {

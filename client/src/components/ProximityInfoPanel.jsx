@@ -5,6 +5,7 @@ function ProximityInfoPanel({ open, onClose, landfills, onLandfillClick, setPane
 
   const inInfluence = landfills?.filter(lf => lf.inInfluence);
   const nearest = landfills?.sort((a, b) => a.distance - b.distance).slice(0, 3);
+  const formatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
   return <InfoPanel title="Landfill Proximity Overview" open={open} onClose={onClose}>
     <div className="info-panel-details" id="serbia">
@@ -23,10 +24,10 @@ function ProximityInfoPanel({ open, onClose, landfills, onLandfillClick, setPane
           <span style={{ color: "var(--brand-secondary)" }}>{lf.distance.toFixed(2)} km away</span>
           <span className="route" onClick={() => onLandfillClick(lf.id)}>{lf.status} Landfill ID {lf.id}</span>
           <p style={{ textAlign: "center", justifyContent: "center" }}><small>
-            Area: {lf.areaM2?.toFixed(2)} m²
+            Area: {formatter.format(lf.areaM2?.toFixed(2))} m²
             <br />
-            Mass: {lf.totalMassTon?.toFixed(2)} ton&nbsp;&nbsp;•&nbsp;
-            CH₄: {lf.annualCH4Tonnes?.toFixed(2)} ton/year
+            Mass: {formatter.format(lf.totalMassTon?.toFixed(2))} ton&nbsp;&nbsp;•&nbsp;
+            CH₄: {formatter.format(lf.annualCH4Tonnes?.toFixed(2))} ton/year
           </small></p>
         </div>
         )}
