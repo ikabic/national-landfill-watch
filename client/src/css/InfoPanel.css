@@ -53,15 +53,15 @@
     }
 
     .info-panel-details#landfill {
-        max-height: calc(20vh);
+        max-height: 20vh;
     }
 
     .info-panel-details#serbia {
-        max-height: calc(50vh);
+        max-height: 50vh;
     }
 
     .info-panel-details#info {
-        max-height: calc(35vh);
+        max-height: 35vh;
     }
 }
 

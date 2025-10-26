@@ -1,14 +1,17 @@
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaArrowDown } from "react-icons/fa";
+import { useMediaQuery } from "react-responsive";
 
 import Layer from "./Layer";
 
 import "../css/LayerPanel.css";
 
 function LayerPanel({ open, onClose, showRegistryLayer, setShowRegistryLayer, showDetectedLayer, setShowDetectedLayer }) {
+    const isMobile = useMediaQuery({ maxWidth: "639px" });
+
     return <>
         <div className={`layer-panel ${open ? "open" : ""}`}>
             <div className="layer-panel-sidebar">
-                <button className="panel-btn close" onClick={onClose}><FaArrowLeft /></button>
+                <button className="panel-btn close" onClick={onClose}>{isMobile ? <FaArrowDown /> : <FaArrowLeft />}</button>
             </div>
 
             <div className="layer-panel-main">
