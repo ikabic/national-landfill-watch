@@ -6,11 +6,11 @@
   <br>
 </h1>
 
-<div align="center">
-  [![Watch Demo](https://img.shields.io/badge/Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/fRQeu2R5udg)
-</div>
-
-<br/>
+<p align="center">
+  <a href="https://youtu.be/fRQeu2R5udg">
+    <img src="https://img.shields.io/badge/Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white">
+  </a>
+</p>
 
 <div align="center">
 
