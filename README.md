@@ -7,15 +7,13 @@
 </h1>
 
 <div align="center">
-    <a href="/">Documentation</a> |
-    <a href="https://youtu.be/fRQeu2R5udg">Demo</a> 
+  [![Watch Demo](https://img.shields.io/badge/Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/fRQeu2R5udg)
 </div>
 
 <br/>
 
 <div align="center">
 
-![license](https://img.shields.io/badge/License-MIT-green)
 ![.NET](https://img.shields.io/badge/.NET-9.0-blueviolet)
 ![React](https://img.shields.io/badge/React-18.3.0-orange)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
